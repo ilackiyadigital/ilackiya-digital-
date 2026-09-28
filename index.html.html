@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>இலக்கியா டிஜிட்டல்</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --text:#1e2430; --sub:#6b7280;
+  --accent:#6d28d9; --accent2:#2563eb; --accent-dark:#5b21b6; --green:#16a34a; --red:#dc2626; --amber:#d97706;
+  --border:#e5e7eb;
+  --grad1:#7c3aed; --grad2:#2563eb;
+  --biz1:#2563eb; --biz2:#ea580c; --biz3:#db2777;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#12151c;--card:#1b2028;--text:#eef1f5;--sub:#9aa3af;--border:#2a3140;}
+}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b2028;--text:#eef1f5;--sub:#9aa3af;--border:#2a3140;}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Noto Sans Tamil",system-ui,sans-serif;}
+.wrap{max-width:520px;margin:0 auto;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));min-height:100%;}
+.hero{background:linear-gradient(135deg,var(--grad1),var(--grad2));border-radius:18px;padding:20px 18px;margin-bottom:16px;color:#fff;box-shadow:0 8px 24px -8px rgba(109,40,217,.5);}
+.hero h1{margin:0 0 4px;font-size:21px;color:#fff;}
+.hero .sub{color:rgba(255,255,255,.85);margin-bottom:0;}
+h1{font-size:19px;margin:0 0 2px;}
+.sub{color:var(--sub);font-size:12.5px;margin-bottom:14px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:12px;}
+label{display:block;font-size:12.5px;color:var(--sub);margin:9px 0 4px;}
+input,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14.5px;}
+button{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-primary{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;width:100%;margin-top:12px;box-shadow:0 4px 14px -4px rgba(109,40,217,.5);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-sm{padding:7px 10px;font-size:12.5px;}
+.role-card{border-radius:16px;padding:22px 16px;text-align:center;cursor:pointer;color:#fff;margin-bottom:12px;font-size:16px;font-weight:700;}
+.role-owner{background:linear-gradient(135deg,#7c3aed,#4338ca);}
+.role-staff{background:linear-gradient(135deg,#0891b2,#0d9488);}
+.role-card .ic{font-size:32px;display:block;margin-bottom:6px;}
+.row{display:flex;gap:8px;}
+.row>*{flex:1;}
+.tabs{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;}
+.tab{flex:1;text-align:center;padding:8px 5px;border-radius:10px;background:var(--card);border:1px solid var(--border);font-size:12px;white-space:nowrap;cursor:pointer;font-weight:600;}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.tab.b1.active{background:var(--biz1);border-color:var(--biz1);}
+.tab.b2.active{background:var(--biz2);border-color:var(--biz2);}
+.tab.b3.active{background:var(--biz3);border-color:var(--biz3);}
+.nav{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;}
+.nav .tab{flex:none;padding:7px 12px;}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.entry{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:8px;}
+.entry:last-child{border-bottom:none;}
+.entry .meta{font-size:11.5px;color:var(--sub);}
+.amt-in{color:var(--green);font-weight:700;white-space:nowrap;}
+.amt-out{color:var(--red);font-weight:700;white-space:nowrap;}
+.totals{display:flex;gap:8px;margin-bottom:12px;}
+.tbox{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;}
+.tbox .n{font-size:16px;font-weight:700;}
+.tbox.in{background:linear-gradient(135deg,#ecfdf5,#ffffff);} .tbox.out{background:linear-gradient(135deg,#fef2f2,#ffffff);} .tbox.net{background:linear-gradient(135deg,#eef2ff,#ffffff);}
+.tbox.in .n{color:var(--green);} .tbox.out .n{color:var(--red);} .tbox.net .n{color:var(--accent);}
+.hidden{display:none !important;}
+.linkbtn{background:none;border:none;color:var(--accent2);font-size:12.5px;padding:4px;text-decoration:underline;}
+.err{color:var(--red);font-size:13px;margin-top:6px;}
+.ok{color:var(--green);font-size:13px;margin-top:6px;}
+.small{font-size:11.5px;color:var(--sub);}
+.del-btn{background:transparent;border:none;color:var(--red);font-size:17px;padding:2px 5px;flex:none;}
+.chip{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);color:var(--sub);}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.presets .tab{flex:none;padding:6px 10px;font-size:11.5px;}
+.loading{text-align:center;color:var(--sub);padding:30px 0;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="loading">ஏற்றுகிறது...</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+// ---- உங்க Firebase Project Config ----
+const firebaseConfig = {
+  apiKey: "AIzaSyDkcFmJSDiIUEN-h68gAzNJQta2m3NdZeU",
+  authDomain: "ilackiya-digital2026.firebaseapp.com",
+  projectId: "ilackiya-digital2026",
+  storageBucket: "ilackiya-digital2026.firebasestorage.app",
+  messagingSenderId: "860528889436",
+  appId: "1:860528889436:web:f5a174e68bddd968d32099",
+  measurementId: "G-NNT5QYF5VV"
+};
+firebase.initializeApp(firebaseConfig);
+// ---------------------------------------
+const BIZ = [
+  {id:'eservice', name:'ஈ சேவை மையம்', icon:'🖥️', cls:'b1'},
+  {id:'xerox', name:'ஜெராக்ஸ் கடை', icon:'📠', cls:'b2'},
+  {id:'photo', name:'போட்டோ ஸ்டூடியோ', icon:'📷', cls:'b3'}
+];
+let dbc=null, session=null, activeBiz=BIZ[0].id, ownerTab='entries';
+let cache={owner:null, staff:[], entries:[], attendance:[], payments:[], requests:[]};
+const app=document.getElementById('app');
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function fmt(n){return '₹'+Number(n||0).toLocaleString('en-IN');}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+function monthStr(d){return (d||todayStr()).slice(0,7);}
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function applyTheme(t){
+  const r=document.documentElement.style;
+  const d={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777'};
+  const x=Object.assign({},d,t||{});
+  r.setProperty('--grad1',x.grad1); r.setProperty('--grad2',x.grad2); r.setProperty('--accent',x.grad1);
+  r.setProperty('--biz1',x.biz1); r.setProperty('--biz2',x.biz2); r.setProperty('--biz3',x.biz3);
+}
+async function init(){
+  try{
+    dbc = firebase.firestore();
+    // ensure owner config exists
+    const authSnap = await dbc.doc('config/auth').get();
+    if(!authSnap.exists){
+      await dbc.doc('config/auth').set({ownerUsername:'owner', ownerPassword:'owner123'});
+    }
+    await refreshAll();
+  }catch(e){
+    app.innerHTML = `<h1>இலக்கியா டிஜிட்டல்</h1>
+    <div class="card"><div class="err">Firebase இணைப்பில் பிழை: ${escapeHtml(e.message||String(e))}<br><br>firebaseConfig சரியா இருக்கான்னு, Firestore Database Enable பண்ணிருக்கீங்களான்னு, Firestore Rules-ல "allow read, write: if true;" வெச்சிருக்கீங்களான்னு பாருங்க.</div></div>`;
+    return;
+  }
+  render();
+}
+async function refreshAll(){
+  const [authSnap, staffQ, entQ, attQ, payQ, reqQ, locSnap, themeSnap] = await Promise.all([
+    dbc.doc('config/auth').get(),
+    dbc.collection('staff').get(),
+    dbc.collection('entries').orderBy('ts','desc').limit(1000).get(),
+    dbc.collection('attendance').orderBy('date','desc').limit(500).get(),
+    dbc.collection('salaryPayments').orderBy('date','desc').limit(500).get(),
+    dbc.collection('requests').get(),
+    dbc.doc('config/shopLocation').get(),
+    dbc.doc('config/theme').get()
+  ]);
+  cache.owner = authSnap.data() || {ownerUsername:'owner', ownerPassword:'owner123'};
+  cache.staff = staffQ.docs.map(d=>({username:d.id, ...d.data()}));
+  cache.entries = entQ.docs.map(d=>({id:d.id, ...d.data()}));
+  cache.attendance = attQ.docs.map(d=>({id:d.id, ...d.data()}));
+  cache.payments = payQ.docs.map(d=>({id:d.id, ...d.data()}));
+  cache.requests = reqQ.docs.map(d=>({id:d.id, ...d.data()})).filter(r=>r.status==='pending');
+  cache.shopLoc = locSnap.exists ? locSnap.data() : null;
+  try{ const th=await dbc.doc('config/theme').get(); cache.theme=th.exists?th.data():null; }catch(e){}
+  applyTheme(cache.theme);
+  cache.theme = themeSnap.exists ? themeSnap.data() : null;
+}
+
+const THEME_DEFAULT={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777'};
+const THEME_PRESETS=[
+  {n:'ஊதா-நீலம்',grad1:'#7c3aed',grad2:'#2563eb'},
+  {n:'பச்சை',grad1:'#059669',grad2:'#0d9488'},
+  {n:'ஆரஞ்சு',grad1:'#ea580c',grad2:'#dc2626'},
+  {n:'இளஞ்சிவப்பு',grad1:'#db2777',grad2:'#7c3aed'},
+  {n:'கடல் நீலம்',grad1:'#0284c7',grad2:'#1e3a8a'},
+  {n:'கருப்பு-தங்கம்',grad1:'#1f2937',grad2:'#b45309'}
+];
+function applyTheme(){
+  const t=Object.assign({},THEME_DEFAULT,cache.theme||{});
+  const r=document.documentElement.style;
+  r.setProperty('--grad1',t.grad1); r.setProperty('--grad2',t.grad2);
+  r.setProperty('--accent',t.grad1); r.setProperty('--accent2',t.grad2);
+  r.setProperty('--biz1',t.biz1); r.setProperty('--biz2',t.biz2); r.setProperty('--biz3',t.biz3);
+}
+function renderTheme(body){
+  const t=Object.assign({},THEME_DEFAULT,cache.theme||{});
+  body.innerHTML=`
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">🎨 தயாரான தீம்கள் (தட்டினா உடனே மாறும்)</div>
+      <div class="presets">${THEME_PRESETS.map((p,i)=>`<div class="tab" data-preset="${i}" style="background:linear-gradient(135deg,${p.grad1},${p.grad2});color:#fff;border:none;">${p.n}</div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">உங்க இஷ்டப்படி நிறங்கள்</div>
+      <div class="row"><div><label>மேல் பட்டை நிறம் 1</label><input type="color" id="c_grad1" value="${t.grad1}" style="height:44px;padding:2px;"></div>
+      <div><label>மேல் பட்டை நிறம் 2</label><input type="color" id="c_grad2" value="${t.grad2}" style="height:44px;padding:2px;"></div></div>
+      <div class="row"><div><label>🖥️ ஈ சேவை</label><input type="color" id="c_biz1" value="${t.biz1}" style="height:44px;padding:2px;"></div>
+      <div><label>📠 ஜெராக்ஸ்</label><input type="color" id="c_biz2" value="${t.biz2}" style="height:44px;padding:2px;"></div>
+      <div><label>📷 போட்டோ</label><input type="color" id="c_biz3" value="${t.biz3}" style="height:44px;padding:2px;"></div></div>
+      <button class="btn-primary" id="saveTheme">நிறங்களை சேமி</button>
+      <button class="btn-outline" id="resetTheme" style="width:100%;margin-top:8px;">பழைய நிறங்களுக்கு மாற்று</button>
+    </div>`;
+  const save=async(obj)=>{ await dbc.doc('config/theme').set(obj); await refreshAll(); render(); };
+  document.querySelectorAll('[data-preset]').forEach(b=>{
+    b.onclick=()=>{ const p=THEME_PRESETS[b.dataset.preset]; save({...t,grad1:p.grad1,grad2:p.grad2}); };
+  });
+  document.getElementById('saveTheme').onclick=()=>save({
+    grad1:document.getElementById('c_grad1').value, grad2:document.getElementById('c_grad2').value,
+    biz1:document.getElementById('c_biz1').value, biz2:document.getElementById('c_biz2').value, biz3:document.getElementById('c_biz3').value});
+  document.getElementById('resetTheme').onclick=()=>save({...THEME_DEFAULT});
+}
+
+function render(){
+  applyTheme();
+  if(!session){
+    const devRole = localStorage.getItem('illakiya_devicerole');
+    if(!devRole){ renderRoleSelect(); return; }
+    renderLogin(devRole);
+    return;
+  }
+  if(session.role==='owner'){renderOwner();} else {renderStaff();}
+}
+
+function renderRoleSelect(){
+  app.innerHTML = `
+    <div class="hero"><h1>இலக்கியா டிஜிட்டல்</h1><div class="sub">ஈ சேவை மையம் · ஜெராக்ஸ் கடை · போட்டோ ஸ்டூடியோ</div></div>
+    <div class="sub" style="margin-bottom:8px;">இந்த போன் யாருடையது?</div>
+    <div class="role-card role-owner" id="pickOwner"><span class="ic">👑</span>ஓனர் / அட்மின்</div>
+    <div class="role-card role-staff" id="pickStaff"><span class="ic">👥</span>ஸ்டாஃப்</div>
+    <div class="small" style="text-align:center;">இதை ஒரு தடவை மட்டும் தேர்ந்தெடுத்தா போதும், இந்த போன்ல எப்போதும் அதே பக்கம் நேரடியா திறக்கும்.</div>
+  `;
+  document.getElementById('pickOwner').onclick=()=>{localStorage.setItem('illakiya_devicerole','owner'); render();};
+  document.getElementById('pickStaff').onclick=()=>{localStorage.setItem('illakiya_devicerole','staff'); render();};
+}
+
+function myPendingRequest(){
+  const myId = localStorage.getItem('illakiya_myreqid');
+  if(!myId) return null;
+  return cache.requests.find(r=>r.id===myId) || 'sent';
+}
+function checkApproval(){
+  const loginId = localStorage.getItem('illakiya_myloginid');
+  if(!loginId) return;
+  const staffMatch = cache.staff.find(s=>s.username===loginId);
+  if(staffMatch){ localStorage.setItem('illakiya_myname', loginId); localStorage.removeItem('illakiya_myreqid'); }
+}
+function renderLogin(devRole){
+  checkApproval();
+  const approvedName = localStorage.getItem('illakiya_myname');
+  const approvedStaff = approvedName ? cache.staff.find(s=>s.username===approvedName) : null;
+  const pending = myPendingRequest();
+  const showStaff = devRole==='staff';
+  const showOwner = devRole==='owner';
+  app.innerHTML = `
+    <div class="hero"><h1>இலக்கியா டிஜிட்டல்</h1><div class="sub">ஈ சேவை மையம் · ஜெராக்ஸ் கடை · போட்டோ ஸ்டூடியோ</div></div>
+
+    ${showStaff && approvedStaff ? `
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">வணக்கம், ${escapeHtml(approvedStaff.name||approvedStaff.username)}</div>
+      <button class="btn-primary" id="staffQuickLogin">ஸ்டாஃப் ஆக நுழைய</button>
+    </div>` : ''}
+
+    ${showStaff && !approvedStaff && pending ? `
+    <div class="card">
+      <div class="sub">உங்கள் கோரிக்கை ஓனரிடம் அனுப்பப்பட்டது. ஓனர் அப்ரூவ் பண்ணும் வரை காத்திருக்கவும்.</div>
+      <button class="linkbtn" id="cancelReq">கோரிக்கையை ரத்து செய்</button>
+    </div>` : ''}
+
+    ${showStaff && !approvedStaff && !pending ? `
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">புதிய ஸ்டாஃப்? நுழைவுக் கோரிக்கை அனுப்பு</div>
+      <label>உங்கள் பெயர்</label><input id="reqName" placeholder="முழு பெயர்">
+      <label>Login ID (எளிதான பெயர், எ.கா: ravi)</label><input id="reqLoginId" autocomplete="off">
+      <label>கடவுச்சொல் (Password) - விரும்பினால்</label><input id="reqPw" type="password" placeholder="காலியா விட்டா OTP/தட்டி நுழைய மட்டும் வேலை செய்யும்">
+      <button class="btn-primary" id="sendReqBtn">நுழைவுக் கோரிக்கை அனுப்பு</button>
+      <div class="small" style="margin-top:6px;">ஓனர் அப்ரூவ் பண்ணினா, இந்த Login ID வெச்சு பாஸ்வேர்ட் அல்லது OTP-லும் நுழையலாம்.</div>
+    </div>
+    <div class="card">
+      <div class="top" style="margin-bottom:0;"><div class="sub" style="margin:0;">ஏற்கனவே அப்ரூவ் ஆனவரா?</div><button class="linkbtn" id="toggleStaffLogin">பாஸ்வேர்ட் / OTP நுழைவு</button></div>
+      <div id="staffLoginBox" class="hidden">
+        <div class="presets"><div class="tab active" data-slt="pw">பாஸ்வேர்ட்</div><div class="tab" data-slt="otp">OTP கோட்</div></div>
+        <div id="pwLoginForm">
+          <label>Login ID</label><input id="spLoginId" autocomplete="off">
+          <label>கடவுச்சொல்</label><input id="spPw" type="password">
+          <button class="btn-primary" id="spLoginBtn">நுழை</button>
+        </div>
+        <div id="otpLoginForm" class="hidden">
+          <label>Login ID</label><input id="soLoginId" autocomplete="off">
+          <label>OTP கோட்</label><input id="soCode" inputmode="numeric" placeholder="6 இலக்க கோட்">
+          <button class="btn-primary" id="soLoginBtn">நுழை</button>
+        </div>
+        <div class="err hidden" id="staffLoginErr">தவறான தகவல்</div>
+      </div>
+    </div>` : ''}
+
+    ${showOwner ? `
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">👑 ஓனர் லாகின்</div>
+      <label>Login ID</label><input id="lu" autocomplete="off">
+      <label>கடவுச்சொல்</label><input id="lp" type="password">
+      <button class="btn-primary" id="loginBtn">லாகின்</button>
+      <div class="err hidden" id="loginErr">Login ID / கடவுச்சொல் தவறு</div>
+    </div>` : ''}
+
+    <div class="small" style="text-align:center;">இந்த டேட்டா அனைத்து டிவைஸிலும் ஒன்றாக ஒத்திசைக்கும்.</div>
+    <div style="text-align:center;margin-top:6px;"><button class="linkbtn" id="switchRole">${showOwner? 'இது ஸ்டாஃப் போன் ஆ? மாற்ற' : 'இது ஓனர் போன் ஆ? மாற்ற'}</button></div>
+  `;
+  document.getElementById('switchRole').onclick=()=>{localStorage.removeItem('illakiya_devicerole'); render();};
+  const loginBtnEl=document.getElementById('loginBtn');
+  if(loginBtnEl) loginBtnEl.onclick=async()=>{
+    const u=document.getElementById('lu').value.trim(), p=document.getElementById('lp').value;
+    if(u===cache.owner.ownerUsername && p===cache.owner.ownerPassword){session={role:'owner'}; await refreshAll(); render(); return;}
+    document.getElementById('loginErr').classList.remove('hidden');
+  };
+  const quickBtn=document.getElementById('staffQuickLogin');
+  if(quickBtn) quickBtn.onclick=async()=>{ session={role:'staff', username:approvedStaff.username}; await refreshAll(); render(); };
+  const sendBtn=document.getElementById('sendReqBtn');
+  if(sendBtn) sendBtn.onclick=async()=>{
+    const name=document.getElementById('reqName').value.trim();
+    const loginId=document.getElementById('reqLoginId').value.trim();
+    const pw=document.getElementById('reqPw').value;
+    if(!name||!loginId){alert('பெயர் & Login ID தேவை'); return;}
+    const ref = await dbc.collection('requests').add({name, loginId, password:pw, status:'pending', ts:Date.now()});
+    localStorage.setItem('illakiya_myreqid', ref.id);
+    localStorage.setItem('illakiya_myloginid', loginId);
+    await refreshAll(); render();
+  };
+  const cancelBtn=document.getElementById('cancelReq');
+  if(cancelBtn) cancelBtn.onclick=async()=>{
+    const id=localStorage.getItem('illakiya_myreqid');
+    if(id){ try{ await dbc.doc('requests/'+id).delete(); }catch(e){} localStorage.removeItem('illakiya_myreqid'); localStorage.removeItem('illakiya_myloginid'); }
+    await refreshAll(); render();
+  };
+  const toggleStaffLogin=document.getElementById('toggleStaffLogin');
+  if(toggleStaffLogin) toggleStaffLogin.onclick=()=>document.getElementById('staffLoginBox').classList.toggle('hidden');
+  document.querySelectorAll('.tab[data-slt]').forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll('.tab[data-slt]').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('pwLoginForm').classList.toggle('hidden', t.dataset.slt!=='pw');
+      document.getElementById('otpLoginForm').classList.toggle('hidden', t.dataset.slt!=='otp');
+    };
+  });
+  const spBtn=document.getElementById('spLoginBtn');
+  if(spBtn) spBtn.onclick=async()=>{
+    const id=document.getElementById('spLoginId').value.trim(), pw=document.getElementById('spPw').value;
+    const s=cache.staff.find(x=>x.username===id && x.password && x.password===pw);
+    if(s){ localStorage.setItem('illakiya_myname', id); session={role:'staff', username:id}; await refreshAll(); render(); return; }
+    document.getElementById('staffLoginErr').classList.remove('hidden');
+  };
+  const soBtn=document.getElementById('soLoginBtn');
+  if(soBtn) soBtn.onclick=async()=>{
+    const id=document.getElementById('soLoginId').value.trim(), code=document.getElementById('soCode').value.trim();
+    const s=cache.staff.find(x=>x.username===id);
+    if(s && s.otpCode && s.otpCode===code && s.otpExpiry && s.otpExpiry>Date.now()){
+      await dbc.doc('staff/'+id).update({otpCode:null, otpExpiry:null});
+      localStorage.setItem('illakiya_myname', id); session={role:'staff', username:id}; await refreshAll(); render(); return;
+    }
+    document.getElementById('staffLoginErr').classList.remove('hidden');
+  };
+}
+
+function bizTabs(){return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.cls} ${b.id===activeBiz?'active':''}" data-biz="${b.id}">${b.icon} ${b.name}</div>`).join('')}</div>`;}
+function attachBizTabs(){document.querySelectorAll('.tab[data-biz]').forEach(t=>{t.onclick=()=>{activeBiz=t.dataset.biz; render();};});}
+
+function myAttendanceToday(username){return cache.attendance.find(a=>a.username===username && a.date===todayStr());}
+
+function distMeters(lat1,lng1,lat2,lng2){
+  const R=6371000, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+async function punch(username, field, method){
+  const id=username+'_'+todayStr();
+  const existing = cache.attendance.find(a=>a.id===id);
+  const data = existing? {...existing} : {username, date:todayStr()};
+  data[field]=nowTime();
+  data[field+'Method']=method||'manual';
+  await dbc.doc('attendance/'+id).set(data);
+  await refreshAll(); render();
+}
+function tryGeoAttendance(username){
+  if(!cache.shopLoc || !navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(async(pos)=>{
+    const d = distMeters(pos.coords.latitude, pos.coords.longitude, cache.shopLoc.lat, cache.shopLoc.lng);
+    const inRange = d <= (cache.shopLoc.radius||150);
+    const att = myAttendanceToday(username);
+    if(inRange && (!att || !att.inTime)){
+      await punch(username,'inTime','gps');
+    } else if(!inRange && att && att.inTime && !att.outTime){
+      await punch(username,'outTime','gps');
+    }
+  }, ()=>{}, {enableHighAccuracy:true, timeout:8000});
+}
+
+function renderStaff(){
+  const list = cache.entries.filter(e=>e.biz===activeBiz && e.by===session.username).slice(0,20);
+  const att = myAttendanceToday(session.username);
+  app.innerHTML = `
+    <div class="top">
+      <div><h1 style="margin-bottom:0">இலக்கியா டிஜிட்டல்</h1><div class="sub">ஸ்டாஃப்: ${session.username}</div></div>
+      <button class="btn-outline btn-sm" id="logoutBtn">லாக்அவுட்</button>
+    </div>
+    <div class="card">
+      <div class="top" style="margin-bottom:6px;"><div class="sub" style="margin:0;">இன்றைய வருகை</div><span class="chip">${todayStr()}</span></div>
+      ${cache.shopLoc ? `<div class="small" style="margin-bottom:8px;">📍 கடை Location அமைக்கப்பட்டுள்ளது — நீங்க கடை அருகில் வந்தா தானாகவே Check-In, வெளியே போனா தானாகவே Check-Out ஆகும் (ஆப் திறந்த நேரத்தில்).</div>` : ''}
+      <div class="row">
+        <button class="btn-outline" id="inBtn" ${att&&att.inTime?'disabled':''}>${att&&att.inTime? 'IN: '+att.inTime+(att.inTimeMethod==='gps'?' 📍':'') : 'Check-In'}</button>
+        <button class="btn-outline" id="outBtn" ${!att||!att.inTime||att.outTime?'disabled':''}>${att&&att.outTime? 'OUT: '+att.outTime+(att.outTimeMethod==='gps'?' 📍':'') : 'Check-Out'}</button>
+      </div>
+    </div>
+    ${bizTabs()}
+    <div class="card">
+      <div class="row">
+        <div><label>வகை</label><select id="etype"><option value="in">வரவு</option><option value="out">செலவு</option></select></div>
+        <div><label>தொகை (₹)</label><input id="eamt" type="number" inputmode="decimal" placeholder="0"></div>
+      </div>
+      <label>விவரம்</label><input id="edesc" placeholder="விவரம் எழுதவும்">
+      <button class="btn-primary" id="addBtn">சேர்</button>
+      <div class="ok hidden" id="addOk">சேர்க்கப்பட்டது ✓</div>
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">உங்கள் சமீபத்திய பதிவுகள் (${BIZ.find(b=>b.id===activeBiz).name})</div>
+      ${list.length? list.map(e=>`<div class="entry"><div><div>${escapeHtml(e.desc||'-')}</div><div class="meta">${e.date}</div></div><div class="${e.type==='in'?'amt-in':'amt-out'}">${e.type==='in'?'+':'-'}${fmt(e.amt)}</div></div>`).join('') : '<div class="small">பதிவுகள் இல்லை</div>'}
+    </div>
+  `;
+  attachBizTabs();
+  tryGeoAttendance(session.username);
+  document.getElementById('logoutBtn').onclick=()=>{session=null; render();};
+  document.getElementById('inBtn').onclick=()=>punch(session.username,'inTime');
+  document.getElementById('outBtn').onclick=()=>punch(session.username,'outTime');
+  document.getElementById('addBtn').onclick=async()=>{
+    const amt=parseFloat(document.getElementById('eamt').value);
+    const type=document.getElementById('etype').value;
+    const desc=document.getElementById('edesc').value.trim();
+    if(!amt||amt<=0){alert('சரியான தொகையை உள்ளிடவும்'); return;}
+    await dbc.collection('entries').add({biz:activeBiz, type, amt, desc, date:todayStr(), ts:Date.now(), by:session.username});
+    await refreshAll(); render();
+  };
+}
+
+function ownerNav(){
+  const reqCount = cache.requests.length;
+  const tabs=[['entries','பதிவுகள்'],['reports','ரிப்போர்ட்'],['requests','கோரிக்கை'+(reqCount?' ('+reqCount+')':'')],['staff','ஸ்டாஃப்'],['attendance','வருகை'],['salary','சம்பளம்'],['theme','🎨 நிறம்']];
+  return `<div class="nav">${tabs.map(t=>`<div class="tab ${ownerTab===t[0]?'active':''}" data-nav="${t[0]}">${t[1]}</div>`).join('')}</div>`;
+}
+function attachNav(){document.querySelectorAll('.tab[data-nav]').forEach(t=>{t.onclick=()=>{ownerTab=t.dataset.nav; render();};});}
+
+function renderOwner(){
+  app.innerHTML = `
+    <div class="top">
+      <div><h1 style="margin-bottom:0">இலக்கியா டிஜிட்டல்</h1><div class="sub">ஓனர் டாஷ்போர்டு</div></div>
+      <button class="btn-outline btn-sm" id="logoutBtn">லாக்அவுட்</button>
+    </div>
+    ${ownerNav()}
+    <div id="body"></div>
+  `;
+  document.getElementById('logoutBtn').onclick=()=>{session=null; render();};
+  attachNav();
+  const body=document.getElementById('body');
+  if(ownerTab==='entries') renderOwnerEntries(body);
+  else if(ownerTab==='reports') renderReports(body);
+  else if(ownerTab==='requests') renderRequests(body);
+  else if(ownerTab==='staff') renderStaffMgmt(body);
+  else if(ownerTab==='attendance') renderAttendanceView(body);
+  else if(ownerTab==='salary') renderSalary(body);
+  else if(ownerTab==='theme') renderTheme(body);
+  else if(ownerTab==='theme') renderTheme(body);
+}
+
+function renderOwnerEntries(body){
+  const all=cache.entries.filter(e=>e.biz===activeBiz);
+  const list=all.slice(0,40);
+  const inT=all.filter(e=>e.type==='in').reduce((s,e)=>s+Number(e.amt),0);
+  const outT=all.filter(e=>e.type==='out').reduce((s,e)=>s+Number(e.amt),0);
+  body.innerHTML = `
+    ${bizTabs()}
+    <div class="totals">
+      <div class="tbox in"><div class="small">வரவு</div><div class="n">${fmt(inT)}</div></div>
+      <div class="tbox out"><div class="small">செலவு</div><div class="n">${fmt(outT)}</div></div>
+      <div class="tbox net"><div class="small">இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><label>வகை</label><select id="etype"><option value="in">வரவு</option><option value="out">செலவு</option></select></div>
+        <div><label>தொகை (₹)</label><input id="eamt" type="number" inputmode="decimal"></div>
+      </div>
+      <label>விவரம்</label><input id="edesc" placeholder="விவரம்">
+      <button class="btn-primary" id="addBtn">சேர்</button>
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">அனைத்து பதிவுகள் (${BIZ.find(b=>b.id===activeBiz).name})</div>
+      ${list.length? list.map(e=>`<div class="entry"><div><div>${escapeHtml(e.desc||'-')} <span class="small">(${e.by})</span></div><div class="meta">${e.date}</div></div><div style="display:flex;align-items:center;gap:4px;"><div class="${e.type==='in'?'amt-in':'amt-out'}">${e.type==='in'?'+':'-'}${fmt(e.amt)}</div><button class="del-btn" data-id="${e.id}">✕</button></div></div>`).join('') : '<div class="small">பதிவுகள் இல்லை</div>'}
+    </div>
+  `;
+  attachBizTabs();
+  document.getElementById('addBtn').onclick=async()=>{
+    const amt=parseFloat(document.getElementById('eamt').value);
+    const type=document.getElementById('etype').value;
+    const desc=document.getElementById('edesc').value.trim();
+    if(!amt||amt<=0){alert('சரியான தொகையை உள்ளிடவும்'); return;}
+    await dbc.collection('entries').add({biz:activeBiz, type, amt, desc, date:todayStr(), ts:Date.now(), by:'owner'});
+    await refreshAll(); render();
+  };
+  document.querySelectorAll('.del-btn[data-id]').forEach(b=>{
+    b.onclick=async()=>{ if(!confirm('இந்த பதிவை நீக்கவா?')) return; await dbc.doc('entries/'+b.dataset.id).delete(); await refreshAll(); render();};
+  });
+}
+
+let repFrom=null, repTo=null, repBiz='all', repType='all';
+function setPreset(p){
+  const t=new Date(); const today=todayStr();
+  if(p==='today'){repFrom=today; repTo=today;}
+  else if(p==='yesterday'){const y=new Date(t); y.setDate(y.getDate()-1); const s=y.toISOString().slice(0,10); repFrom=s; repTo=s;}
+  else if(p==='week'){const w=new Date(t); w.setDate(w.getDate()-6); repFrom=w.toISOString().slice(0,10); repTo=today;}
+  else if(p==='month'){repFrom=today.slice(0,8)+'01'; repTo=today;}
+  else if(p==='all'){repFrom=''; repTo='';}
+}
+function renderReports(body){
+  if(repFrom===null){setPreset('today');}
+  const filtered = cache.entries.filter(e=>{
+    if(repBiz!=='all' && e.biz!==repBiz) return false;
+    if(repType!=='all' && e.type!==repType) return false;
+    if(repFrom && e.date<repFrom) return false;
+    if(repTo && e.date>repTo) return false;
+    return true;
+  });
+  const inT=filtered.filter(e=>e.type==='in').reduce((s,e)=>s+Number(e.amt),0);
+  const outT=filtered.filter(e=>e.type==='out').reduce((s,e)=>s+Number(e.amt),0);
+  body.innerHTML = `
+    <div class="card">
+      <div class="sub" style="margin-bottom:4px;">தேதி வரம்பு தேர்வு</div>
+      <div class="presets">
+        <div class="tab" data-p="today">இன்று</div><div class="tab" data-p="yesterday">நேற்று</div>
+        <div class="tab" data-p="week">7 நாட்கள்</div><div class="tab" data-p="month">இந்த மாதம்</div><div class="tab" data-p="all">அனைத்தும்</div>
+      </div>
+      <div class="row">
+        <div><label>தொடக்க தேதி</label><input type="date" id="fromD" value="${repFrom}"></div>
+        <div><label>முடிவு தேதி</label><input type="date" id="toD" value="${repTo}"></div>
+      </div>
+      <label>வியாபாரம்</label>
+      <select id="bizSel"><option value="all">அனைத்தும்</option>${BIZ.map(b=>`<option value="${b.id}" ${repBiz===b.id?'selected':''}>${b.name}</option>`).join('')}</select>
+      <label>வகை</label>
+      <select id="typeSel"><option value="all" ${repType==='all'?'selected':''}>அனைத்தும்</option><option value="in" ${repType==='in'?'selected':''}>வரவு</option><option value="out" ${repType==='out'?'selected':''}>செலவு</option></select>
+      <button class="btn-primary" id="applyBtn">ரிப்போர்ட் எடு</button>
+    </div>
+    <div class="totals">
+      <div class="tbox in"><div class="small">மொத்த வரவு</div><div class="n">${fmt(inT)}</div></div>
+      <div class="tbox out"><div class="small">மொத்த செலவு</div><div class="n">${fmt(outT)}</div></div>
+      <div class="tbox net"><div class="small">நிகர இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div>
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">பதிவுகள் (${filtered.length})</div>
+      ${filtered.length? filtered.slice(0,300).map(e=>`<div class="entry"><div><div>${escapeHtml(e.desc||'-')} <span class="small">· ${BIZ.find(b=>b.id===e.biz)?.name||e.biz} · ${e.by}</span></div><div class="meta">${e.date}</div></div><div class="${e.type==='in'?'amt-in':'amt-out'}">${e.type==='in'?'+':'-'}${fmt(e.amt)}</div></div>`).join('') : '<div class="small">பதிவுகள் இல்லை</div>'}
+    </div>
+  `;
+  document.querySelectorAll('.tab[data-p]').forEach(t=>{t.onclick=()=>{setPreset(t.dataset.p); render();};});
+  document.getElementById('applyBtn').onclick=()=>{
+    repFrom=document.getElementById('fromD').value; repTo=document.getElementById('toD').value;
+    repBiz=document.getElementById('bizSel').value; repType=document.getElementById('typeSel').value;
+    render();
+  };
+}
+
+function renderRequests(body){
+  body.innerHTML = `
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">புதிய நுழைவுக் கோரிக்கைகள்</div>
+      ${cache.requests.length? cache.requests.map(r=>`
+        <div class="entry">
+          <div><div>${escapeHtml(r.name)} <span class="small">(ID: ${escapeHtml(r.loginId||'-')})</span></div><div class="meta">${new Date(r.ts).toLocaleString('en-IN')}</div></div>
+          <div class="row" style="flex:none;gap:6px;">
+            <button class="btn-primary btn-sm" style="margin:0;width:auto;" data-approve="${r.id}">அப்ரூவ்</button>
+            <button class="btn-outline btn-sm" data-reject="${r.id}">நிராகரி</button>
+          </div>
+        </div>`).join('') : '<div class="small">புதிய கோரிக்கை இல்லை</div>'}
+    </div>
+  `;
+  document.querySelectorAll('[data-approve]').forEach(b=>{
+    b.onclick=async()=>{
+      const req = cache.requests.find(r=>r.id===b.dataset.approve);
+      if(!req) return;
+      let loginId = (req.loginId||req.name||uid()).trim().toLowerCase().replace(/\s+/g,'');
+      if(!loginId || cache.staff.some(s=>s.username===loginId) || loginId===cache.owner.ownerUsername){
+        loginId = loginId + uid().slice(-3);
+      }
+      await dbc.doc('staff/'+loginId).set({name:req.name, password:req.password||'', salary:0});
+      await dbc.doc('requests/'+req.id).delete();
+      await refreshAll(); render();
+    };
+  });
+  document.querySelectorAll('[data-reject]').forEach(b=>{
+    b.onclick=async()=>{
+      await dbc.doc('requests/'+b.dataset.reject).delete();
+      await refreshAll(); render();
+    };
+  });
+}
+
+function renderStaffMgmt(body){
+  body.innerHTML = `
+    <div class="card">
+      <div class="top"><div class="sub" style="margin:0;">ஸ்டாஃப் பட்டியல்</div><button class="linkbtn" id="toggleStaffForm">+ புதிய ஸ்டாஃப்</button></div>
+      <div id="staffForm" class="hidden">
+        <label>பெயர்</label><input id="sname">
+        <label>மாத சம்பளம் (₹)</label><input id="ssal" type="number">
+        <button class="btn-primary" id="saveStaff">ஸ்டாஃப் சேர்</button>
+      </div>
+      ${cache.staff.length? cache.staff.map(s=>`
+        <div class="entry" style="flex-wrap:wrap;">
+          <div><div>${escapeHtml(s.name||s.username)} <span class="small">(ID: ${s.username})</span></div><div class="meta">மாத சம்பளம்: ${fmt(s.salary||0)} · பாஸ்வேர்ட்: ${s.password? 'உள்ளது':'இல்லை'}${s.otpCode&&s.otpExpiry>Date.now()? ' · OTP: '+s.otpCode+' (செல்லுபடி: '+new Date(s.otpExpiry).toLocaleTimeString('en-IN')+')':''}</div></div>
+          <button class="del-btn" data-staff="${s.username}">✕</button>
+        </div>
+        <div class="row" style="margin:-6px 0 8px;">
+          <button class="btn-outline btn-sm" data-otp="${s.username}">OTP உருவாக்கு</button>
+          <button class="btn-outline btn-sm" data-setpw="${s.username}">பாஸ்வேர்ட் மாற்ற</button>
+        </div>
+      `).join('') : '<div class="small">ஸ்டாஃப் யாரும் இல்லை</div>'}
+    </div>
+    <div class="card">
+      <button class="linkbtn" id="togglePwForm">ஓனர் Login ID & கடவுச்சொல்லை மாற்ற</button>
+      <div id="pwForm" class="hidden">
+        <label>புதிய Login ID (எ.கா: உங்க போன் நம்பர்)</label><input id="newun" value="${cache.owner.ownerUsername}">
+        <label>புதிய கடவுச்சொல் / PIN</label><input id="newpw" type="password">
+        <button class="btn-primary" id="savePw">சேமி</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('toggleStaffForm').onclick=()=>document.getElementById('staffForm').classList.toggle('hidden');
+  document.getElementById('saveStaff').onclick=async()=>{
+    const name=document.getElementById('sname').value.trim();
+    const sal=parseFloat(document.getElementById('ssal').value)||0;
+    if(!name){alert('பெயரை உள்ளிடவும்'); return;}
+    await dbc.doc('staff/'+uid()).set({name, salary:sal});
+    await refreshAll(); render();
+  };
+  document.querySelectorAll('.del-btn[data-staff]').forEach(b=>{
+    b.onclick=async()=>{ if(!confirm('இந்த ஸ்டாஃபை நீக்கவா?')) return; await dbc.doc('staff/'+b.dataset.staff).delete(); await refreshAll(); render();};
+  });
+  document.querySelectorAll('[data-otp]').forEach(b=>{
+    b.onclick=async()=>{
+      const code=Math.floor(100000+Math.random()*900000).toString();
+      const expiry=Date.now()+10*60*1000;
+      await dbc.doc('staff/'+b.dataset.otp).update({otpCode:code, otpExpiry:expiry});
+      await refreshAll(); render();
+      alert('OTP கோட்: '+code+'\nஇதை ஸ்டாஃப்-க்கு WhatsApp/நேரடியா சொல்லுங்க. 10 நிமிடம் மட்டும் செல்லுபடியாகும்.');
+    };
+  });
+  document.querySelectorAll('[data-setpw]').forEach(b=>{
+    b.onclick=async()=>{
+      const pw=prompt('புதிய கடவுச்சொல் (காலியா விட்டா பாஸ்வேர்ட் நீக்கப்படும்):');
+      if(pw===null) return;
+      await dbc.doc('staff/'+b.dataset.setpw).update({password:pw});
+      await refreshAll(); render();
+    };
+  });
+  document.getElementById('togglePwForm').onclick=()=>document.getElementById('pwForm').classList.toggle('hidden');
+  document.getElementById('savePw').onclick=async()=>{
+    const nu=document.getElementById('newun').value.trim();
+    const np=document.getElementById('newpw').value;
+    if(!nu||!np){alert('Login ID & PIN இரண்டும் தேவை'); return;}
+    await dbc.doc('config/auth').set({ownerUsername:nu, ownerPassword:np});
+    await refreshAll(); alert('சேமிக்கப்பட்டது. இனிமேல் புதிய Login ID & PIN வைச்சு நுழையவும்.'); session=null; render();
+  };
+}
+
+function renderAttendanceView(body){
+  const grouped = cache.attendance.slice(0,60);
+  body.innerHTML = `
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">📍 கடை Location (GPS Auto Attendance)</div>
+      ${cache.shopLoc ? `
+        <div class="small">அமைக்கப்பட்டுள்ளது · ரேடியஸ்: ${cache.shopLoc.radius||150} மீட்டர் · (${cache.shopLoc.lat.toFixed(5)}, ${cache.shopLoc.lng.toFixed(5)})</div>
+        <div class="row" style="margin-top:8px;">
+          <button class="btn-outline btn-sm" id="resetLoc">Location மாற்ற</button>
+        </div>
+      ` : `
+        <div class="small" style="margin-bottom:8px;">கடையிலேயே நின்று அமைக்கலாம், அல்லது நீங்க வேற ஊர்ல இருந்தா Google Maps மூலம் கடையின் coordinates-ஐ போட்டும் அமைக்கலாம்.</div>
+        <label>ரேடியஸ் (மீட்டர்)</label><input id="locRadius" type="number" value="150">
+        <button class="btn-primary" id="setLocBtn">📍 நான் இப்போ கடையில் இருக்கேன் - இந்த இடத்தை அமை</button>
+        <div class="err hidden" id="locErr">Location பெற முடியவில்லை</div>
+        <div class="top" style="margin:14px 0 4px;"><div class="small" style="margin:0;">அல்லது Google Maps coordinates மூலம்:</div></div>
+        <div class="small" style="margin-bottom:8px;">Google Maps-ல் உங்க கடையை தேடுங்க → அந்த இடத்தை Long-press பண்ணுங்க → மேல வரும் எண்களை (Latitude, Longitude) இங்கே Copy-Paste பண்ணுங்க.</div>
+        <label>Latitude</label><input id="manLat" placeholder="எ.கா: 11.0168">
+        <label>Longitude</label><input id="manLng" placeholder="எ.கா: 76.9558">
+        <button class="btn-outline" id="setLocManualBtn" style="width:100%;">இந்த Coordinates-ஐ கடை Location ஆக சேமி</button>
+      `}
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">வருகை பதிவேடு (சமீபத்தியவை)</div>
+      ${grouped.length? grouped.map(a=>`<div class="entry"><div><div>${escapeHtml(a.username)}</div><div class="meta">${a.date}</div></div><div class="small">${a.inTime||'--'}${a.inTimeMethod==='gps'?'📍':''} → ${a.outTime||'--'}${a.outTimeMethod==='gps'?'📍':''}</div></div>`).join('') : '<div class="small">பதிவு இல்லை</div>'}
+    </div>
+  `;
+  const setBtn=document.getElementById('setLocBtn');
+  if(setBtn) setBtn.onclick=()=>{
+    if(!navigator.geolocation){document.getElementById('locErr').classList.remove('hidden'); return;}
+    navigator.geolocation.getCurrentPosition(async(pos)=>{
+      const radius=parseFloat(document.getElementById('locRadius').value)||150;
+      await dbc.doc('config/shopLocation').set({lat:pos.coords.latitude, lng:pos.coords.longitude, radius});
+      await refreshAll(); render();
+    }, ()=>{document.getElementById('locErr').classList.remove('hidden');}, {enableHighAccuracy:true, timeout:8000});
+  };
+  const resetBtn=document.getElementById('resetLoc');
+  if(resetBtn) resetBtn.onclick=async()=>{ await dbc.doc('config/shopLocation').delete(); await refreshAll(); render(); };
+  const manBtn=document.getElementById('setLocManualBtn');
+  if(manBtn) manBtn.onclick=async()=>{
+    const lat=parseFloat(document.getElementById('manLat').value);
+    const lng=parseFloat(document.getElementById('manLng').value);
+    const radius=parseFloat(document.getElementById('locRadius').value)||150;
+    if(isNaN(lat)||isNaN(lng)){ alert('சரியான Latitude & Longitude கொடுக்கவும்'); return; }
+    await dbc.doc('config/shopLocation').set({lat, lng, radius});
+    await refreshAll(); render();
+  };
+}
+
+function renderTheme(body){
+  const d={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777'};
+  const t=Object.assign({},d,cache.theme||{});
+  const presets=[['ஊதா-நீலம்','#7c3aed','#2563eb'],['பச்சை','#059669','#0d9488'],['ஆரஞ்சு-சிவப்பு','#ea580c','#dc2626'],['இளஞ்சிவப்பு','#db2777','#9333ea'],['கருநீலம்','#1e3a8a','#0ea5e9']];
+  const fields=[['grad1','முக்கிய நிறம் 1 (Header/பட்டன்)'],['grad2','முக்கிய நிறம் 2'],['biz1','🖥️ ஈ சேவை மையம்'],['biz2','📠 ஜெராக்ஸ் கடை'],['biz3','📷 போட்டோ ஸ்டூடியோ']];
+  body.innerHTML=`
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">🎨 ரெடிமேட் நிறங்கள்</div>
+      <div class="presets">${presets.map((p,i)=>`<div class="tab" data-preset="${i}" style="background:linear-gradient(135deg,${p[1]},${p[2]});color:#fff;border:none;">${p[0]}</div>`).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">உங்க இஷ்டப்படி நிறம் தேர்ந்தெடுங்க</div>
+      ${fields.map(f=>`<label>${f[1]}</label><input type="color" id="c_${f[0]}" value="${t[f[0]]}" style="height:42px;padding:3px;">`).join('')}
+      <button class="btn-primary" id="saveTheme">நிறங்களை சேமி</button>
+      <button class="btn-outline" id="resetTheme" style="width:100%;margin-top:8px;">பழைய நிறத்துக்கு மாற்று</button>
+    </div>`;
+  const read=()=>Object.fromEntries(fields.map(f=>[f[0],document.getElementById('c_'+f[0]).value]));
+  fields.forEach(f=>document.getElementById('c_'+f[0]).oninput=()=>applyTheme(read()));
+  document.querySelectorAll('[data-preset]').forEach(b=>{b.onclick=()=>{
+    const p=presets[b.dataset.preset];
+    document.getElementById('c_grad1').value=p[1]; document.getElementById('c_grad2').value=p[2];
+    applyTheme(read());
+  };});
+  document.getElementById('saveTheme').onclick=async()=>{ await dbc.doc('config/theme').set(read()); await refreshAll(); alert('நிறங்கள் சேமிக்கப்பட்டன. எல்லா டிவைஸிலும் இதே நிறம் தெரியும்.'); render(); };
+  document.getElementById('resetTheme').onclick=async()=>{ await dbc.doc('config/theme').set(d); await refreshAll(); render(); };
+}
+
+function renderSalary(body){
+  const month=todayStr().slice(0,7);
+  body.innerHTML = `
+    <div class="card"><div class="sub">இந்த மாதம்: ${month}</div>
+    ${cache.staff.map(s=>{
+      const paid=cache.payments.filter(p=>p.username===s.username && p.month===month).reduce((sum,p)=>sum+Number(p.amt),0);
+      const due=(s.salary||0)-paid;
+      return `<div class="entry"><div><div>${escapeHtml(s.name||s.username)}</div><div class="meta">சம்பளம்: ${fmt(s.salary||0)} · செலுத்தியது: ${fmt(paid)}</div></div><div class="${due>0?'amt-out':'amt-in'}">${due>0?'பாக்கி '+fmt(due):'முழுமை ✓'}</div></div>`;
+    }).join('') || '<div class="small">ஸ்டாஃப் யாரும் இல்லை</div>'}
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">சம்பளம் செலுத்தியதை பதிவு செய்ய</div>
+      <label>ஸ்டாஃப்</label>
+      <select id="paySt">${cache.staff.map(s=>`<option value="${s.username}">${escapeHtml(s.name||s.username)}</option>`).join('')}</select>
+      <label>தொகை (₹)</label><input id="payAmt" type="number">
+      <label>குறிப்பு</label><input id="payNote" placeholder="எ.கா: பகுதி பணம்">
+      <button class="btn-primary" id="payBtn">பதிவு செய்</button>
+    </div>
+    <div class="card">
+      <div class="sub" style="margin-bottom:6px;">சம்பள பதிவுகள் (சமீபத்தியவை)</div>
+      ${cache.payments.slice(0,20).map(p=>`<div class="entry"><div><div>${escapeHtml(p.username)} <span class="small">${p.note?'· '+escapeHtml(p.note):''}</span></div><div class="meta">${p.date} · ${p.month}</div></div><div class="amt-in">${fmt(p.amt)}</div></div>`).join('') || '<div class="small">பதிவு இல்லை</div>'}
+    </div>
+  `;
+  document.getElementById('payBtn').onclick=async()=>{
+    const u=document.getElementById('paySt').value, amt=parseFloat(document.getElementById('payAmt').value);
+    const note=document.getElementById('payNote').value.trim();
+    if(!u||!amt||amt<=0){alert('சரியான தொகையை உள்ளிடவும்'); return;}
+    await dbc.collection('salaryPayments').add({username:u, amt, note, date:todayStr(), month:todayStr().slice(0,7)});
+    await refreshAll(); render();
+  };
+}
+
+init();
+</script>
+</body>
+</html>
