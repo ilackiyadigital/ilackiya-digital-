@@ -26,13 +26,15 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"
 .hero .sub{color:rgba(255,255,255,.85);margin-bottom:0;}
 h1{font-size:19px;margin:0 0 2px;}
 .sub{color:var(--sub);font-size:12.5px;margin-bottom:14px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:12px;}
+.card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--grad1);border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:0 2px 10px -6px rgba(0,0,0,.15);}
 label{display:block;font-size:12.5px;color:var(--sub);margin:9px 0 4px;}
 input,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14.5px;}
-button{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;}
-.btn-primary{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;width:100%;margin-top:12px;box-shadow:0 4px 14px -4px rgba(109,40,217,.5);}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
-.btn-danger{background:var(--red);color:#fff;}
+button{border:none;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;transition:transform .1s ease, opacity .15s ease;}
+button:active{transform:scale(0.96);opacity:.9;}
+.btn-primary{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;width:100%;margin-top:12px;box-shadow:0 4px 14px -4px var(--grad1);}
+.btn-outline{background:color-mix(in srgb, var(--grad1) 14%, transparent);border:none;color:var(--grad1);font-weight:700;}
+.btn-outline:disabled{background:color-mix(in srgb, var(--sub) 12%, transparent);color:var(--sub);}
+.btn-danger{background:linear-gradient(135deg,#f87171,#dc2626);color:#fff;box-shadow:0 4px 12px -4px rgba(220,38,38,.5);}
 .btn-sm{padding:7px 10px;font-size:12.5px;}
 .role-card{border-radius:16px;padding:22px 16px;text-align:center;cursor:pointer;color:#fff;margin-bottom:12px;font-size:16px;font-weight:700;}
 .role-owner{background:linear-gradient(135deg,#7c3aed,#4338ca);}
@@ -41,7 +43,8 @@ button{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weig
 .row{display:flex;gap:8px;}
 .row>*{flex:1;}
 .tabs{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;}
-.tab{flex:1;text-align:center;padding:8px 5px;border-radius:10px;background:var(--card);border:1px solid var(--border);font-size:12px;white-space:nowrap;cursor:pointer;font-weight:600;}
+.tab{flex:1;text-align:center;padding:8px 5px;border-radius:12px;background:color-mix(in srgb, var(--grad1) 12%, var(--card));border:none;color:var(--grad1);font-size:12px;white-space:nowrap;cursor:pointer;font-weight:700;transition:transform .1s ease;}
+.tab:active{transform:scale(0.96);}
 .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .tab.b1.active{background:var(--biz1);border-color:var(--biz1);}
 .tab.b2.active{background:var(--biz2);border-color:var(--biz2);}
@@ -60,12 +63,12 @@ button{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weig
 .tbox.in{background:linear-gradient(135deg,#ecfdf5,#ffffff);} .tbox.out{background:linear-gradient(135deg,#fef2f2,#ffffff);} .tbox.net{background:linear-gradient(135deg,#eef2ff,#ffffff);}
 .tbox.in .n{color:var(--green);} .tbox.out .n{color:var(--red);} .tbox.net .n{color:var(--accent);}
 .hidden{display:none !important;}
-.linkbtn{background:none;border:none;color:var(--accent2);font-size:12.5px;padding:4px;text-decoration:underline;}
+.linkbtn{background:none;border:none;color:var(--grad1);font-size:12.5px;padding:4px;text-decoration:underline;font-weight:600;}
 .err{color:var(--red);font-size:13px;margin-top:6px;}
 .ok{color:var(--green);font-size:13px;margin-top:6px;}
 .small{font-size:11.5px;color:var(--sub);}
-.del-btn{background:transparent;border:none;color:var(--red);font-size:17px;padding:2px 5px;flex:none;}
-.chip{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);color:var(--sub);}
+.del-btn{background:color-mix(in srgb, var(--red) 14%, transparent);border:none;color:var(--red);font-size:15px;padding:5px 9px;border-radius:8px;flex:none;font-weight:700;}
+.chip{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;background:color-mix(in srgb, var(--grad1) 15%, transparent);color:var(--grad1);font-weight:700;}
 .presets{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
 .presets .tab{flex:none;padding:6px 10px;font-size:11.5px;}
 .loading{text-align:center;color:var(--sub);padding:30px 0;}
@@ -89,12 +92,14 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 // ---------------------------------------
-const BIZ = [
-  {id:'eservice', name:'ஈ சேவை மையம்', icon:'🖥️', cls:'b1'},
-  {id:'xerox', name:'ஜெராக்ஸ் கடை', icon:'📠', cls:'b2'},
-  {id:'photo', name:'போட்டோ ஸ்டூடியோ', icon:'📷', cls:'b3'}
+const DEFAULT_BIZ = [
+  {id:'eservice', name:'ஈ சேவை மையம்', icon:'🖥️', color:'#2563eb'},
+  {id:'xerox', name:'ஜெராக்ஸ் கடை', icon:'📠', color:'#ea580c'},
+  {id:'photo', name:'போட்டோ ஸ்டூடியோ', icon:'📷', color:'#db2777'}
 ];
-let dbc=null, session=null, activeBiz=BIZ[0].id, ownerTab='entries';
+let BIZ = DEFAULT_BIZ.map(b=>({...b}));
+const COLOR_PALETTE=['#2563eb','#ea580c','#db2777','#059669','#7c3aed','#d97706','#0891b2','#dc2626'];
+let dbc=firebase.firestore(), session=null, activeBiz=BIZ[0].id, ownerTab='entries';
 let bizId = localStorage.getItem('illakiya_bizId') || null;
 let masterSession = false, masterViewBizId = null;
 const MASTER_PASSWORD = 'illakiya-master-2026'; // இந்த பாஸ்வேர்டை மாத்திக்கவும், யாருக்கும் சொல்லாதீங்க
@@ -153,6 +158,11 @@ async function refreshAll(){
   cache.payments = payQ.docs.map(d=>({id:d.id, ...d.data()}));
   cache.requests = reqQ.docs.map(d=>({id:d.id, ...d.data()})).filter(r=>r.status==='pending');
   cache.shopLoc = locSnap.exists ? locSnap.data() : null;
+  try{
+    const catSnap = await dbc.doc(P('config/categories')).get();
+    BIZ = (catSnap.exists && Array.isArray(catSnap.data().list) && catSnap.data().list.length) ? catSnap.data().list : DEFAULT_BIZ.map(b=>({...b}));
+  }catch(e){ BIZ = DEFAULT_BIZ.map(b=>({...b})); }
+  if(!BIZ.find(b=>b.id===activeBiz)) activeBiz = BIZ[0] ? BIZ[0].id : null;
   try{ const th=await dbc.doc(P('config/theme')).get(); cache.theme=th.exists?th.data():null; }catch(e){}
   applyTheme(cache.theme);
   cache.theme = themeSnap.exists ? themeSnap.data() : null;
@@ -174,6 +184,50 @@ function applyTheme(){
   r.setProperty('--accent',t.grad1); r.setProperty('--accent2',t.grad2);
   r.setProperty('--biz1',t.biz1); r.setProperty('--biz2',t.biz2); r.setProperty('--biz3',t.biz3);
 }
+function renderCategories(body){
+  body.innerHTML = `
+    <div class="card">
+      <div class="sub" style="margin-bottom:8px;">உங்க கடை வகைகள் (Tabs)</div>
+      ${BIZ.map((b,i)=>`
+        <div class="row" style="margin-bottom:8px;align-items:center;">
+          <input type="text" value="${escapeHtml(b.name)}" data-catname="${b.id}" style="flex:2;">
+          <input type="text" value="${b.icon||''}" data-caticon="${b.id}" placeholder="🏪" style="flex:0 0 60px;text-align:center;">
+          <input type="color" value="${b.color||'#2563eb'}" data-catcolor="${b.id}" style="flex:0 0 44px;height:40px;padding:2px;">
+          <button class="del-btn" data-catdel="${b.id}">✕</button>
+        </div>`).join('')}
+      <button class="btn-outline" id="addCatBtn" style="width:100%;margin-top:6px;">+ புது வகை சேர்</button>
+      <button class="btn-primary" id="saveCatBtn">மாற்றங்களை சேமி</button>
+      <div class="small" style="margin-top:8px;">வகையை நீக்கினாலும், அந்த வகையில் ஏற்கனவே போட்ட பதிவுகள் நீங்காது — ஆனா அந்த tab இனி தெரியாது.</div>
+    </div>
+  `;
+  document.getElementById('addCatBtn').onclick=()=>{
+    const color = COLOR_PALETTE[BIZ.length % COLOR_PALETTE.length];
+    BIZ.push({id:uid(), name:'புது வகை', icon:'🏪', color});
+    renderCategories(body);
+  };
+  document.querySelectorAll('[data-catdel]').forEach(b=>{
+    b.onclick=()=>{
+      if(BIZ.length<=1){ alert('குறைந்தது ஒரு வகை இருக்கணும்'); return; }
+      BIZ = BIZ.filter(x=>x.id!==b.dataset.catdel);
+      renderCategories(body);
+    };
+  });
+  document.getElementById('saveCatBtn').onclick=async()=>{
+    BIZ.forEach(b=>{
+      const n=document.querySelector('[data-catname="'+b.id+'"]');
+      const ic=document.querySelector('[data-caticon="'+b.id+'"]');
+      const c=document.querySelector('[data-catcolor="'+b.id+'"]');
+      if(n) b.name=n.value.trim()||b.name;
+      if(ic) b.icon=ic.value.trim()||'🏪';
+      if(c) b.color=c.value;
+    });
+    await dbc.doc(P('config/categories')).set({list:BIZ});
+    if(!BIZ.find(x=>x.id===activeBiz)) activeBiz=BIZ[0].id;
+    alert('வகைகள் சேமிக்கப்பட்டன.');
+    render();
+  };
+}
+
 function renderTheme(body){
   const t=Object.assign({},THEME_DEFAULT,cache.theme||{});
   body.innerHTML=`
@@ -205,6 +259,7 @@ function render(){
   applyTheme();
   if(masterSession && !masterViewBizId){ renderMaster(); return; }
   if(masterSession && masterViewBizId){ renderOwner(); return; }
+  if(!masterSession && new URLSearchParams(location.search).get('master')==='1'){ renderMasterLogin(); return; }
   if(!bizId){ renderBizGate(); return; }
   if(!session){
     const devRole = localStorage.getItem('illakiya_devicerole');
@@ -257,6 +312,7 @@ function renderMasterLogin(){
   };
 }
 
+let newBizCats = DEFAULT_BIZ.map(b=>({...b}));
 async function renderMaster(){
   app.innerHTML = `<div class="loading">ஏற்றுகிறது...</div>`;
   const snap = await dbc.collection('businesses').get();
@@ -266,6 +322,9 @@ async function renderMaster(){
     <div class="card">
       <div class="sub" style="margin-bottom:6px;">+ புது பிசினஸ் உருவாக்க</div>
       <label>பிசினஸ் பேரு</label><input id="newBizName" placeholder="எ.கா: முருகன் ஈ சேவை">
+      <label style="margin-top:10px;">அவங்களுக்கான கடை வகைகள் (Ready-made Tabs)</label>
+      <div id="newBizCatsBox"></div>
+      <button class="btn-outline" id="addNewCatBtn" style="width:100%;margin-top:6px;">+ இன்னொரு வகை சேர்</button>
       <button class="btn-primary" id="createBizBtn">புது பிசினஸ் + Code உருவாக்கு</button>
     </div>
     <div class="card">
@@ -274,13 +333,38 @@ async function renderMaster(){
     </div>
     <div style="text-align:center;"><button class="linkbtn" id="masterLogout">Master Logout</button></div>
   `;
+  function renderNewBizCats(){
+    document.getElementById('newBizCatsBox').innerHTML = newBizCats.map((c,i)=>`
+      <div class="row" style="margin-bottom:6px;align-items:center;">
+        <input type="text" value="${escapeHtml(c.name)}" data-nname="${i}" style="flex:2;">
+        <input type="text" value="${c.icon||''}" data-nicon="${i}" placeholder="🏪" style="flex:0 0 55px;text-align:center;">
+        <input type="color" value="${c.color||'#2563eb'}" data-ncolor="${i}" style="flex:0 0 40px;height:38px;padding:2px;">
+        <button class="del-btn" data-ndel="${i}">✕</button>
+      </div>`).join('');
+    document.querySelectorAll('[data-nname]').forEach(el=>el.oninput=()=>{newBizCats[el.dataset.nname].name=el.value;});
+    document.querySelectorAll('[data-nicon]').forEach(el=>el.oninput=()=>{newBizCats[el.dataset.nicon].icon=el.value;});
+    document.querySelectorAll('[data-ncolor]').forEach(el=>el.oninput=()=>{newBizCats[el.dataset.ncolor].color=el.value;});
+    document.querySelectorAll('[data-ndel]').forEach(el=>el.onclick=()=>{
+      if(newBizCats.length<=1){alert('குறைந்தது ஒரு வகை வேணும்'); return;}
+      newBizCats.splice(el.dataset.ndel,1); renderNewBizCats();
+    });
+  }
+  renderNewBizCats();
+  document.getElementById('addNewCatBtn').onclick=()=>{
+    newBizCats.push({id:uid(), name:'புது வகை', icon:'🏪', color:COLOR_PALETTE[newBizCats.length % COLOR_PALETTE.length]});
+    renderNewBizCats();
+  };
   document.getElementById('createBizBtn').onclick=async()=>{
     const name=document.getElementById('newBizName').value.trim();
     if(!name){alert('பிசினஸ் பேரு போடவும்'); return;}
     const code=(Math.random().toString(36).slice(2,8)).toUpperCase();
+    const cats = newBizCats.map(c=>({id: c.id||uid(), name:c.name, icon:c.icon, color:c.color}));
     await dbc.doc('businesses/'+code).set({name, createdAt:Date.now()});
     await dbc.doc('businesses/'+code+'/config/auth').set({ownerUsername:'owner', ownerPassword:'owner123'});
-    alert('புது பிசினஸ் Code: '+code+'\\nஇதை அந்த பிசினஸ் ஓனருக்கு கொடுங்க. Default login: owner / owner123');
+    await dbc.doc('businesses/'+code+'/config/categories').set({list:cats});
+    await dbc.doc('businesses/'+code+'/config/theme').set({appName:name});
+    alert('புது பிசினஸ் Code: '+code+'\nஇதை அந்த பிசினஸ் ஓனருக்கு கொடுங்க. Default login: owner / owner123\nகடை வகைகளும், பேருமே ரெடியா அமைக்கப்பட்டுள்ளது.');
+    newBizCats = DEFAULT_BIZ.map(b=>({...b}));
     render();
   };
   document.querySelectorAll('[data-view]').forEach(b=>{
@@ -428,7 +512,7 @@ function renderLogin(devRole){
   };
 }
 
-function bizTabs(){return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.cls} ${b.id===activeBiz?'active':''}" data-biz="${b.id}">${b.icon} ${b.name}</div>`).join('')}</div>`;}
+function bizTabs(){return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.id===activeBiz?'active':''}" data-biz="${b.id}" style="${b.id===activeBiz?'background:'+(b.color||'#2563eb')+';border-color:'+(b.color||'#2563eb')+';color:#fff;':''}">${b.icon||'🏪'} ${escapeHtml(b.name)}</div>`).join('')}</div>`;}
 function attachBizTabs(){document.querySelectorAll('.tab[data-biz]').forEach(t=>{t.onclick=()=>{activeBiz=t.dataset.biz; render();};});}
 
 function myAttendanceToday(username){return cache.attendance.find(a=>a.username===username && a.date===todayStr());}
@@ -510,7 +594,7 @@ function renderStaff(){
 
 function ownerNav(){
   const reqCount = cache.requests.length;
-  const tabs=[['entries','பதிவுகள்'],['reports','ரிப்போர்ட்'],['requests','கோரிக்கை'+(reqCount?' ('+reqCount+')':'')],['staff','ஸ்டாஃப்'],['attendance','வருகை'],['salary','சம்பளம்'],['theme','🎨 நிறம்']];
+  const tabs=[['entries','பதிவுகள்'],['reports','ரிப்போர்ட்'],['requests','கோரிக்கை'+(reqCount?' ('+reqCount+')':'')],['staff','ஸ்டாஃப்'],['attendance','வருகை'],['salary','சம்பளம்'],['categories','🏪 வகைகள்'],['theme','🎨 நிறம்']];
   return `<div class="nav">${tabs.map(t=>`<div class="tab ${ownerTab===t[0]?'active':''}" data-nav="${t[0]}">${t[1]}</div>`).join('')}</div>`;
 }
 function attachNav(){document.querySelectorAll('.tab[data-nav]').forEach(t=>{t.onclick=()=>{ownerTab=t.dataset.nav; render();};});}
@@ -533,6 +617,7 @@ function renderOwner(){
   else if(ownerTab==='staff') renderStaffMgmt(body);
   else if(ownerTab==='attendance') renderAttendanceView(body);
   else if(ownerTab==='salary') renderSalary(body);
+  else if(ownerTab==='categories') renderCategories(body);
   else if(ownerTab==='theme') renderTheme(body);
   else if(ownerTab==='theme') renderTheme(body);
 }
@@ -846,7 +931,22 @@ function renderSalary(body){
   };
 }
 
-init();
+async function handleUrlParams(){
+  const params = new URLSearchParams(location.search);
+  const bizParam = params.get('biz');
+  const roleParam = params.get('role');
+  if(bizParam){
+    try{
+      const code = bizParam.trim().toUpperCase();
+      const snap = await dbc.doc('businesses/'+code).get();
+      if(snap.exists){ bizId=code; localStorage.setItem('illakiya_bizId', code); }
+    }catch(e){}
+  }
+  if(roleParam==='owner' || roleParam==='staff'){
+    localStorage.setItem('illakiya_devicerole', roleParam);
+  }
+}
+handleUrlParams().then(init);
 </script>
 </body>
 </html>
