@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ta">
 <head>
 <meta charset="UTF-8">
@@ -12,53 +12,39 @@
   --accent: #6366f1; --accent-dark: #4f46e5;
   --green: #10b981; --green-light: #ecfdf5;
   --red: #ef4444; --red-light: #fef2f2;
-  --amber: #f59e0b; --amber-light: #fffbeb;
   --blue: #0ea5e9; --blue-light: #f0f9ff;
-  --purple: #8b5cf6; --purple-light: #f5f3ff;
   --border: #e2e8f0;
   --grad-hero: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #d946ef 100%);
   --grad-btn: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  box-sizing: border-box; padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg: #090d16; --card: #131b2e; --text: #f8fafc; --sub: #94a3b8;
     --border: #1e293b;
     --green-light: rgba(16,185,129,0.15); --red-light: rgba(239,68,68,0.15);
-    --amber-light: rgba(245,158,11,0.15); --blue-light: rgba(14,165,233,0.15);
-    --purple-light: rgba(139,92,246,0.15);
+    --blue-light: rgba(14,165,233,0.15);
   }
 }
-:root[data-theme="dark"]{
-  --bg: #090d16; --card: #131b2e; --text: #f8fafc; --sub: #94a3b8;
-  --border: #1e293b;
-  --green-light: rgba(16,185,129,0.15); --red-light: rgba(239,68,68,0.15);
-  --amber-light: rgba(245,158,11,0.15); --blue-light: rgba(14,165,233,0.15);
-}
 *{box-sizing:border-box;}
-html,body{height:100%;}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Tamil",sans-serif;}
-.wrap{max-width:540px;margin:0 auto;padding:16px;min-height:100%;}
-.hero{background:var(--grad-hero);border-radius:22px;padding:22px 20px;margin-bottom:16px;color:#fff;box-shadow:0 10px 25px -5px rgba(79,70,229,0.45);}
-.hero h1{margin:0 0 4px;font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.wrap{max-width:540px;margin:0 auto;padding:16px;min-height:100vh;}
+.hero{background:var(--grad-hero);border-radius:20px;padding:20px;margin-bottom:16px;color:#fff;}
+.hero h1{margin:0 0 4px;font-size:22px;color:#fff;}
 .hero .sub{color:rgba(255,255,255,0.9);font-size:13px;margin:0;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 4px 15px -3px rgba(0,0,0,0.04);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;}
 label{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:10px 0 4px;}
-input,select{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;}
-input:focus,select:focus{border-color:var(--accent);}
-button{border:none;border-radius:12px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .1s ease;}
-button:active{transform:scale(0.97);}
-.btn-primary{background:var(--grad-btn);color:#fff;width:100%;margin-top:12px;box-shadow:0 4px 14px -3px rgba(79,70,229,0.5);}
-.btn-outline{background:var(--blue-light);color:var(--blue);font-weight:700;}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;}
+button{border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-primary{background:var(--grad-btn);color:#fff;width:100%;margin-top:12px;}
+.btn-outline{background:var(--blue-light);color:var(--blue);}
 .btn-danger{background:var(--red-light);color:var(--red);}
 .btn-success{background:var(--green-light);color:var(--green);}
-.btn-purple{background:var(--purple-light);color:var(--purple);}
-.btn-sm{padding:7px 11px;font-size:12px;border-radius:10px;}
+.btn-sm{padding:7px 11px;font-size:12px;border-radius:8px;}
 .row{display:flex;gap:8px;align-items:center;}
 .row>*{flex:1;}
-.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;}
-.tab{flex:1;text-align:center;padding:9px 8px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--sub);font-size:12px;white-space:nowrap;cursor:pointer;font-weight:700;}
-.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 3px 10px -2px var(--accent);}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+.tab{flex:1;text-align:center;padding:9px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--sub);font-size:12px;white-space:nowrap;cursor:pointer;font-weight:700;}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .nav{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;}
 .nav .tab{flex:none;padding:8px 14px;}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -68,26 +54,19 @@ button:active{transform:scale(0.97);}
 .amt-in{color:var(--green);font-weight:800;font-size:15px;}
 .amt-out{color:var(--red);font-weight:800;font-size:15px;}
 .totals{display:flex;gap:8px;margin-bottom:14px;}
-.tbox{flex:1;border-radius:14px;padding:12px 10px;text-align:center;border:1px solid var(--border);}
+.tbox{flex:1;border-radius:12px;padding:12px 10px;text-align:center;border:1px solid var(--border);}
 .tbox .n{font-size:17px;font-weight:800;margin-top:2px;}
-.tbox.in{background:var(--green-light);border-color:color-mix(in srgb, var(--green) 30%, transparent);}
-.tbox.in .n{color:var(--green);}
-.tbox.out{background:var(--red-light);border-color:color-mix(in srgb, var(--red) 30%, transparent);}
-.tbox.out .n{color:var(--red);}
-.tbox.net{background:var(--blue-light);border-color:color-mix(in srgb, var(--blue) 30%, transparent);}
-.tbox.net .n{color:var(--blue);}
+.tbox.in{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.tbox.out{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.tbox.net{background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
 .hidden{display:none !important;}
 .linkbtn{background:none;border:none;color:var(--accent);font-size:12.5px;text-decoration:underline;cursor:pointer;font-weight:700;}
-.del-btn{background:var(--red-light);color:var(--red);padding:6px 10px;border-radius:8px;}
-.restore-btn{background:var(--green-light);color:var(--green);padding:6px 10px;border-radius:8px;}
 .user-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);background:var(--border);}
-.avatar-ph{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--purple-light);color:var(--purple);font-size:20px;font-weight:800;}
+.avatar-ph{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--blue-light);color:var(--blue);font-size:20px;font-weight:800;}
 .loading{text-align:center;color:var(--sub);padding:30px 0;}
-
-/* ID Card Styles */
 .id-card-wrap{max-width:320px;margin:16px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.15);border:2px solid #e2e8f0;text-align:center;color:#1e293b;}
 .id-header{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;padding:16px 10px;}
-.id-header h2{margin:0;font-size:17px;font-weight:800;letter-spacing:0.5px;}
+.id-header h2{margin:0;font-size:17px;font-weight:800;}
 .id-header p{margin:2px 0 0;font-size:11px;opacity:0.9;}
 .id-body{padding:18px 14px;}
 .id-photo{width:90px;height:90px;border-radius:50%;border:4px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.15);object-fit:cover;margin-top:-50px;background:#f1f5f9;}
@@ -114,8 +93,7 @@ const firebaseConfig = {
   measurementId: "G-NNT5QYF5VV"
 };
 firebase.initializeApp(firebaseConfig);
-
-let dbc = firebase.firestore();
+const dbc = firebase.firestore();
 
 const DEFAULT_BIZ = [
   {id:'eservice', name:'ஈ சேவை மையம்', icon:'🖥️', color:'#2563eb'},
@@ -128,16 +106,16 @@ let bizId = localStorage.getItem('illakiya_bizId') || null;
 let masterSession = false, masterViewBizId = null, masterTab='all';
 const MASTER_PASSWORD = 'illakiya-master-2026';
 
-function P(p){ return 'businesses/'+(masterSession && masterViewBizId ? masterViewBizId : bizId)+'/'+p; }
+function P(p){ return 'businesses/' + (masterSession && masterViewBizId ? masterViewBizId : bizId) + '/' + p; }
 let cache={owner:null, staff:[], entries:[], attendance:[], payments:[], requests:[], trash:[]};
 const app=document.getElementById('app');
 
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
-function fmt(n){return '₹'+Number(n||0).toLocaleString('en-IN');}
-function todayStr(){return new Date().toISOString().slice(0,10);}
-function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function fmt(n){ return '₹' + Number(n||0).toLocaleString('en-IN'); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-let APP_NAME='Business App';
+let APP_NAME = 'Business App';
 
 function compressImage(file, callback){
   const reader = new FileReader();
@@ -169,7 +147,6 @@ async function init(){
       renderMasterLogin();
       return;
     }
-
     if(bizId || (masterSession && masterViewBizId)){
       const authSnap = await dbc.doc(P('config/auth')).get();
       if(!authSnap.exists){
@@ -218,25 +195,25 @@ function render(){
     renderLogin(devRole);
     return;
   }
-  if(session.role==='owner'){renderOwner();} else {renderStaff();}
+  if(session.role==='owner'){ renderOwner(); } else { renderStaff(); }
 }
 
 function renderBizGate(){
   app.innerHTML = `
-    <div class="hero"><h1>வணக்கம் 👋</h1><div class="sub">வணிக மேலாண்மை தளம்</div></div>
+    <div class="hero"><h1>வணக்கம்</h1><div class="sub">வணிக மேலாண்மை தளம்</div></div>
     <div class="card">
-      <div style="font-weight:700;margin-bottom:8px;">Business Code-ஐ உள்ளிடவும்</div>
-      <input id="bizCodeInput" placeholder="எ.கா: AB12CD" style="text-transform:uppercase;font-size:16px;letter-spacing:1.5px;text-align:center;font-weight:800;">
-      <button class="btn-primary" id="bizGoBtn">🚀 உள்நுழை</button>
-      <div class="err hidden" id="bizErr" style="color:var(--red);margin-top:8px;font-size:13px;text-align:center;">தவறான Code! சரிபார்த்து உள்ளிடவும்.</div>
+      <div style="font-weight:700;margin-bottom:8px;">Business Code உள்ளிடவும்</div>
+      <input id="bizCodeInput" placeholder="எ.கா: AB12CD" style="text-transform:uppercase;font-size:16px;text-align:center;font-weight:800;">
+      <button class="btn-primary" id="bizGoBtn">உள்நுழை</button>
+      <div class="err hidden" id="bizErr" style="color:var(--red);margin-top:8px;font-size:13px;text-align:center;">தவறான Code! சரிபார்க்கவும்.</div>
     </div>
     <div style="text-align:center;margin-top:14px;"><button class="linkbtn" id="masterLoginLink">Master Admin Login</button></div>
   `;
   document.getElementById('bizGoBtn').onclick=async()=>{
-    const code=document.getElementById('bizCodeInput').value.trim().toUpperCase();
+    const code = document.getElementById('bizCodeInput').value.trim().toUpperCase();
     if(!code) return;
     try{
-      const snap = await firebase.firestore().doc('businesses/'+code).get();
+      const snap = await dbc.doc('businesses/'+code).get();
       if(!snap.exists || snap.data().deleted){ document.getElementById('bizErr').classList.remove('hidden'); return; }
       bizId=code; localStorage.setItem('illakiya_bizId', code);
       await init();
@@ -247,18 +224,18 @@ function renderBizGate(){
 
 function renderMasterLogin(){
   app.innerHTML = `
-    <div class="hero"><h1>👑 Master Admin</h1><div class="sub">அனைத்து கடைகளையும் நிர்வகிக்க</div></div>
+    <div class="hero"><h1>Master Admin</h1><div class="sub">அனைத்து கடைகளையும் நிர்வகிக்க</div></div>
     <div class="card">
       <label>Master Password</label><input id="mp" type="password">
-      <button class="btn-primary" id="mpBtn">🔒 உள்நுழை</button>
-      <button class="linkbtn" id="mpBack" style="display:block;margin:12px auto 0;">← திரும்ப</button>
+      <button class="btn-primary" id="mpBtn">உள்நுழை</button>
+      <button class="linkbtn" id="mpBack" style="display:block;margin:12px auto 0;">திரும்ப</button>
       <div class="err hidden" id="mpErr" style="color:var(--red);margin-top:8px;">தவறான கடவுச்சொல்!</div>
     </div>
   `;
   document.getElementById('mpBack').onclick=()=>{ bizId=null; render(); };
   document.getElementById('mpBtn').onclick=()=>{
     if(document.getElementById('mp').value===MASTER_PASSWORD){
-      masterSession=true; dbc=firebase.firestore(); render();
+      masterSession=true; render();
     } else { document.getElementById('mpErr').classList.remove('hidden'); }
   };
 }
@@ -271,13 +248,13 @@ async function renderMaster(){
   const trashList = allList.filter(b=>b.deleted);
 
   app.innerHTML = `
-    <div class="hero"><h1>👑 Master Admin</h1><div class="sub">கடைகள் மற்றும் மீட்டெடுப்பு</div></div>
+    <div class="hero"><h1>Master Admin</h1><div class="sub">கடைகள் மற்றும் மீட்டெடுப்பு</div></div>
     <div class="nav">
-      <div class="tab ${masterTab==='all'?'active':''}" data-mt="all">🏪 இயங்கும் கடைகள் (${activeList.length})</div>
-      <div class="tab ${masterTab==='trash'?'active':''}" data-mt="trash">♻️ குப்பைத்தொட்டி (${trashList.length})</div>
+      <div class="tab ${masterTab==='all'?'active':''}" data-mt="all">இயங்கும் கடைகள் (${activeList.length})</div>
+      <div class="tab ${masterTab==='trash'?'active':''}" data-mt="trash">குப்பைத்தொட்டி (${trashList.length})</div>
     </div>
     <div id="masterBody"></div>
-    <div style="text-align:center;margin-top:16px;"><button class="linkbtn" id="masterLogout" style="color:var(--red);">🚪 Master Logout</button></div>
+    <div style="text-align:center;margin-top:16px;"><button class="linkbtn" id="masterLogout" style="color:var(--red);">Master Logout</button></div>
   `;
 
   document.querySelectorAll('[data-mt]').forEach(t=>{
@@ -288,9 +265,9 @@ async function renderMaster(){
   if(masterTab==='all'){
     mBody.innerHTML = `
       <div class="card">
-        <div style="font-weight:700;margin-bottom:8px;">+ புதிய அட்மின் / கடை சேர்க்க</div>
+        <div style="font-weight:700;margin-bottom:8px;">புதிய கடை சேர்க்க</div>
         <label>கடை பெயர்</label><input id="newBizName" placeholder="எ.கா: ராஜா டிஜிட்டல்">
-        <button class="btn-primary" id="createBizBtn">✨ புது பிசினஸ் + Code உருவாக்கு</button>
+        <button class="btn-primary" id="createBizBtn">புது பிசினஸ் Code உருவாக்கு</button>
       </div>
       <div class="card">
         <div style="font-weight:700;margin-bottom:10px;">பதிவு செய்யப்பட்ட கடைகள் (${activeList.length})</div>
@@ -301,21 +278,21 @@ async function renderMaster(){
               <div class="meta">Code: <b>${b.id}</b></div>
             </div>
             <div style="display:flex;gap:6px;">
-              <button class="btn-outline btn-sm" data-view="${b.id}">👁️ பார்</button>
-              <button class="del-btn btn-sm" data-softdel="${b.id}" data-name="${escapeHtml(b.name||b.id)}">🗑️</button>
+              <button class="btn-outline btn-sm" data-view="${b.id}">பார்</button>
+              <button class="btn-danger btn-sm" data-softdel="${b.id}" data-name="${escapeHtml(b.name||b.id)}">நீக்கு</button>
             </div>
           </div>`).join('') : '<div class="small">கடைகள் எதுவும் இல்லை</div>'}
       </div>
     `;
 
     document.getElementById('createBizBtn').onclick=async()=>{
-      const name=document.getElementById('newBizName').value.trim();
-      if(!name){alert('கடை பெயர் உள்ளிடவும்'); return;}
-      const code=(Math.random().toString(36).slice(2,8)).toUpperCase();
+      const name = document.getElementById('newBizName').value.trim();
+      if(!name){ alert('கடை பெயர் உள்ளிடவும்'); return; }
+      const code = (Math.random().toString(36).slice(2,8)).toUpperCase();
       await dbc.doc('businesses/'+code).set({name, createdAt:Date.now(), deleted:false});
       await dbc.doc('businesses/'+code+'/config/auth').set({ownerUsername:'owner', ownerPassword:'owner123'});
       await dbc.doc('businesses/'+code+'/config/categories').set({list:DEFAULT_BIZ});
-      alert(`புதிய கடை உருவாக்கப்பட்டது!\n\nBusiness Code: ${code}\nகடைக்காரரிடம் இந்த Code-ஐ பகிருங்கள்.`);
+      alert('புதிய கடை உருவாக்கப்பட்டது! Code: ' + code);
       renderMaster();
     };
 
@@ -325,7 +302,7 @@ async function renderMaster(){
 
     document.querySelectorAll('[data-softdel]').forEach(b=>{
       b.onclick=async()=>{
-        if(!confirm(`"${b.dataset.name}" கடையை குப்பைத்தொட்டிக்கு (Trash) நகர்த்தவா?`)) return;
+        if(!confirm(`"${b.dataset.name}" கடையை குப்பைத்தொட்டிக்கு நகர்த்தவா?`)) return;
         await dbc.doc('businesses/'+b.dataset.softdel).update({deleted:true, deletedAt:Date.now()});
         renderMaster();
       };
@@ -333,7 +310,7 @@ async function renderMaster(){
   } else {
     mBody.innerHTML = `
       <div class="card">
-        <div style="font-weight:700;margin-bottom:10px;color:var(--red);">♻️ நீக்கப்பட்ட கடைகள் (Recycle Bin)</div>
+        <div style="font-weight:700;margin-bottom:10px;color:var(--red);">நீக்கப்பட்ட கடைகள் (Recycle Bin)</div>
         ${trashList.length? trashList.map(b=>`
           <div class="entry">
             <div>
@@ -341,17 +318,17 @@ async function renderMaster(){
               <div class="meta">Code: <b>${b.id}</b></div>
             </div>
             <div style="display:flex;gap:6px;">
-              <button class="restore-btn btn-sm" data-restore="${b.id}">♻️ மீட்டெடு</button>
-              <button class="btn-danger btn-sm" data-permadel="${b.id}" data-name="${escapeHtml(b.name||b.id)}">❌ நிரந்தர நீக்கம்</button>
+              <button class="btn-success btn-sm" data-restore="${b.id}">மீட்டெடு</button>
+              <button class="btn-danger btn-sm" data-permadel="${b.id}" data-name="${escapeHtml(b.name||b.id)}">முற்றிலும் நீக்கு</button>
             </div>
-          </div>`).join('') : '<div class="small">குப்பைத்தொட்டியில் எதுவும் இல்லை!</div>'}
+          </div>`).join('') : '<div class="small">குப்பைத்தொட்டியில் எதுவும் இல்லை</div>'}
       </div>
     `;
 
     document.querySelectorAll('[data-restore]').forEach(b=>{
       b.onclick=async()=>{
         await dbc.doc('businesses/'+b.dataset.restore).update({deleted:false});
-        alert('கடை வெற்றிகரமாக மீட்டெடுக்கப்பட்டது!');
+        alert('கடை மீட்டெடுக்கப்பட்டது!');
         renderMaster();
       };
     });
@@ -359,8 +336,7 @@ async function renderMaster(){
     document.querySelectorAll('[data-permadel]').forEach(b=>{
       b.onclick=async()=>{
         if(!confirm(`"${b.dataset.name}" கடையை நிரந்தரமாக அழிக்கவா?`)) return;
-        const targetId = b.dataset.permadel;
-        await dbc.doc('businesses/' + targetId).delete();
+        await dbc.doc('businesses/' + b.dataset.permadel).delete();
         alert('நிரந்தரமாக நீக்கப்பட்டது!');
         renderMaster();
       };
@@ -375,27 +351,27 @@ function renderRoleSelect(){
     <div class="hero"><h1>${APP_NAME}</h1><div class="sub">வணிக மேலாண்மை தளம்</div></div>
     <div style="font-weight:700;margin-bottom:10px;">இந்த போன் யாருடையது?</div>
     <div class="card" id="pickOwner" style="cursor:pointer;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;">
-      <div style="font-size:26px;">👑</div>
-      <div style="font-size:17px;font-weight:800;margin-top:4px;">கடை உரிமையாளர் (Owner)</div>
+      <div style="font-size:20px;">👑</div>
+      <div style="font-size:16px;font-weight:800;margin-top:4px;">கடை உரிமையாளர் (Owner)</div>
     </div>
     <div class="card" id="pickStaff" style="cursor:pointer;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;">
-      <div style="font-size:26px;">👥</div>
-      <div style="font-size:17px;font-weight:800;margin-top:4px;">பணியாளர் (Staff)</div>
+      <div style="font-size:20px;">👥</div>
+      <div style="font-size:16px;font-weight:800;margin-top:4px;">பணியாளர் (Staff)</div>
     </div>
   `;
-  document.getElementById('pickOwner').onclick=()=>{localStorage.setItem('illakiya_devicerole','owner'); render();};
-  document.getElementById('pickStaff').onclick=()=>{localStorage.setItem('illakiya_devicerole','staff'); render();};
+  document.getElementById('pickOwner').onclick=()=>{ localStorage.setItem('illakiya_devicerole','owner'); render(); };
+  document.getElementById('pickStaff').onclick=()=>{ localStorage.setItem('illakiya_devicerole','staff'); render(); };
 }
 
 function renderLogin(devRole){
   const showOwner = devRole==='owner';
   app.innerHTML = `
-    <div class="hero"><h1>${APP_NAME}</h1><div class="sub">${showOwner?'👑 ஓனர் உள்நுழைவு':'👥 பணியாளர் உள்நுழைவு'}</div></div>
+    <div class="hero"><h1>${APP_NAME}</h1><div class="sub">${showOwner?'ஓனர் உள்நுழைவு':'பணியாளர் உள்நுழைவு'}</div></div>
     <div class="card">
-      <label>Login ID</label><input id="lu" autocomplete="off" placeholder="உங்கள் ID">
-      <label>கடவுச்சொல்</label><input id="lp" type="password" placeholder="••••••••">
-      <button class="btn-primary" id="loginBtn">🚀 உள்நுழை</button>
-      <div class="err hidden" id="loginErr" style="color:var(--red);margin-top:8px;">தவறான Login ID அல்லது கடவுச்சொல்!</div>
+      <label>Login ID</label><input id="lu" autocomplete="off">
+      <label>கடவுச்சொல்</label><input id="lp" type="password">
+      <button class="btn-primary" id="loginBtn">உள்நுழை</button>
+      <div class="err hidden" id="loginErr" style="color:var(--red);margin-top:8px;">தவறான தகவல்!</div>
     </div>
     <div style="text-align:center;margin-top:12px;">
       <button class="linkbtn" id="switchRole">${showOwner? 'பணியாளர் போனுக்கு மாற்ற':'ஓனர் போனுக்கு மாற்ற'}</button>
@@ -403,7 +379,7 @@ function renderLogin(devRole){
       <button class="linkbtn" id="changeBiz" style="color:var(--sub);margin-top:8px;">வேறொரு கடைக்கு மாற (Change Code)</button>
     </div>
   `;
-  document.getElementById('switchRole').onclick=()=>{localStorage.removeItem('illakiya_devicerole'); render();};
+  document.getElementById('switchRole').onclick=()=>{ localStorage.removeItem('illakiya_devicerole'); render(); };
   document.getElementById('changeBiz').onclick=()=>{
     if(confirm('வேறு கடைக்கு மாற விரும்புகிறீர்களா?')){
       localStorage.removeItem('illakiya_bizId');
@@ -412,38 +388,38 @@ function renderLogin(devRole){
     }
   };
   document.getElementById('loginBtn').onclick=async()=>{
-    const u=document.getElementById('lu').value.trim(), p=document.getElementById('lp').value;
+    const u = document.getElementById('lu').value.trim(), p = document.getElementById('lp').value;
     if(showOwner){
       if(u===cache.owner.ownerUsername && p===cache.owner.ownerPassword){ session={role:'owner'}; await refreshAll(); render(); return; }
     } else {
-      const s=cache.staff.find(x=>x.username===u && x.password===p);
+      const s = cache.staff.find(x=>x.username===u && x.password===p);
       if(s){ session={role:'staff', username:u}; await refreshAll(); render(); return; }
     }
     document.getElementById('loginErr').classList.remove('hidden');
   };
 }
 
-function bizTabs(){return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.id===activeBiz?'active':''}" data-biz="${b.id}">${b.icon\vert{}\vert{}'🏪'} ${escapeHtml(b.name)}</div>`).join('')}</div>`;}
-function attachBizTabs(){document.querySelectorAll('.tab[data-biz]').forEach(t=>{t.onclick=()=>{activeBiz=t.dataset.biz; render();};});}
+function bizTabs(){ return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.id===activeBiz?'active':''}" data-biz="${b.id}">${b.icon\vert{}\vert{}'🏪'} ${escapeHtml(b.name)}</div>`).join('')}</div>`; }
+function attachBizTabs(){ document.querySelectorAll('.tab[data-biz]').forEach(t=>{ t.onclick=()=>{ activeBiz=t.dataset.biz; render(); }; }); }
 
 function renderOwner(){
   app.innerHTML = `
     <div class="top">
-      <div><h1 style="margin:0;font-size:20px;font-weight:800;">${APP_NAME}</h1><div class="sub">👑 ஓனர் டாஷ்போர்டு</div></div>
-      <button class="btn-outline btn-sm" id="logoutBtn">${masterSession?'← Master':'🚪 லாக்அவுட்'}</button>
+      <div><h1 style="margin:0;font-size:19px;font-weight:800;">${APP_NAME}</h1><div class="sub">ஓனர் டாஷ்போர்டு</div></div>
+      <button class="btn-outline btn-sm" id="logoutBtn">${masterSession?'← Master':'லாக்அவுட்'}</button>
     </div>
     <div class="nav">
-      <div class="tab ${ownerTab==='entries'?'active':''}" data-nav="entries">💰 வரவு-செலவு</div>
-      <div class="tab ${ownerTab==='staff'?'active':''}" data-nav="staff">👥 பணியாளர்கள்</div>
-      <div class="tab ${ownerTab==='trash'?'active':''}" data-nav="trash">♻️ மீட்பகம்</div>
-      <div class="tab ${ownerTab==='settings'?'active':''}" data-nav="settings">⚙️ அமைப்புகள்</div>
+      <div class="tab ${ownerTab==='entries'?'active':''}" data-nav="entries">வரவு-செலவு</div>
+      <div class="tab ${ownerTab==='staff'?'active':''}" data-nav="staff">பணியாளர்கள்</div>
+      <div class="tab ${ownerTab==='trash'?'active':''}" data-nav="trash">மீட்பகம்</div>
+      <div class="tab ${ownerTab==='settings'?'active':''}" data-nav="settings">அமைப்புகள்</div>
     </div>
     <div id="body"></div>
   `;
-  document.getElementById('logoutBtn').onclick=()=>{session=null; if(masterSession){masterViewBizId=null;} render();};
-  document.querySelectorAll('[data-nav]').forEach(t=>{t.onclick=()=>{ownerTab=t.dataset.nav; render();};});
+  document.getElementById('logoutBtn').onclick=()=>{ session=null; if(masterSession){masterViewBizId=null;} render(); };
+  document.querySelectorAll('[data-nav]').forEach(t=>{ t.onclick=()=>{ ownerTab=t.dataset.nav; render(); }; });
 
-  const body=document.getElementById('body');
+  const body = document.getElementById('body');
   if(ownerTab==='entries') renderEntries(body);
   else if(ownerTab==='staff') renderStaffMgmt(body);
   else if(ownerTab==='trash') renderOwnerTrash(body);
@@ -451,23 +427,23 @@ function renderOwner(){
 }
 
 function renderEntries(body){
-  const all=cache.entries.filter(e=>e.biz===activeBiz);
-  const inT=all.filter(e=>e.type==='in').reduce((s,e)=>s+Number(e.amt),0);
-  const outT=all.filter(e=>e.type==='out').reduce((s,e)=>s+Number(e.amt),0);
+  const all = cache.entries.filter(e=>e.biz===activeBiz);
+  const inT = all.filter(e=>e.type==='in').reduce((s,e)=>s+Number(e.amt),0);
+  const outT = all.filter(e=>e.type==='out').reduce((s,e)=>s+Number(e.amt),0);
   body.innerHTML = `
     ${bizTabs()}
     <div class="totals">
-      <div class="tbox in"><div class="small">📥 வரவு</div><div class="n">${fmt(inT)}</div></div>
-      <div class="tbox out"><div class="small">📤 செலவு</div><div class="n">${fmt(outT)}</div></div>
-      <div class="tbox net"><div class="small">💵 இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div>
+      <div class="tbox in"><div class="small">வரவு</div><div class="n">${fmt(inT)}</div></div>
+      <div class="tbox out"><div class="small">செலவு</div><div class="n">${fmt(outT)}</div></div>
+      <div class="tbox net"><div class="small">இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div>
     </div>
     <div class="card">
       <div class="row">
-        <div><label>வகை</label><select id="etype"><option value="in">📥 வரவு (+)</option><option value="out">📤 செலவு (-)</option></select></div>
-        <div><label>தொகை (₹)</label><input id="eamt" type="number" inputmode="decimal" placeholder="0"></div>
+        <div><label>வகை</label><select id="etype"><option value="in">வரவு (+)</option><option value="out">செலவு (-)</option></select></div>
+        <div><label>தொகை (₹)</label><input id="eamt" type="number" inputmode="decimal"></div>
       </div>
-      <label>விவரம்</label><input id="edesc" placeholder="விவரம் எழுதவும்">
-      <button class="btn-primary" id="addBtn">➕ புதிய பதிவு சேர்</button>
+      <label>விவரம்</label><input id="edesc">
+      <button class="btn-primary" id="addBtn">பதிவு சேர்</button>
     </div>
     <div class="card">
       <div style="font-weight:700;margin-bottom:8px;">சமீபத்திய பதிவுகள்</div>
@@ -479,17 +455,17 @@ function renderEntries(body){
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="${e.type==='in'?'amt-in':'amt-out'}">${e.type==='in'?'+':'-'}${fmt(e.amt)}</div>
-            <button class="del-btn btn-sm" data-delentry="${e.id}">🗑️</button>
+            <button class="btn-danger btn-sm" data-delentry="${e.id}">நீக்கு</button>
           </div>
         </div>`).join('') : '<div class="small">பதிவுகள் எதுவும் இல்லை</div>'}
     </div>
   `;
   attachBizTabs();
   document.getElementById('addBtn').onclick=async()=>{
-    const amt=parseFloat(document.getElementById('eamt').value);
-    const type=document.getElementById('etype').value;
-    const desc=document.getElementById('edesc').value.trim();
-    if(!amt||amt<=0){alert('தொகை உள்ளிடவும்'); return;}
+    const amt = parseFloat(document.getElementById('eamt').value);
+    const type = document.getElementById('etype').value;
+    const desc = document.getElementById('edesc').value.trim();
+    if(!amt||amt<=0){ alert('தொகை உள்ளிடவும்'); return; }
     await dbc.collection(P('entries')).add({biz:activeBiz, type, amt, desc, date:todayStr(), ts:Date.now(), by:session.role, deleted:false});
     await refreshAll(); render();
   };
@@ -505,29 +481,29 @@ function renderEntries(body){
 function renderStaffMgmt(body){
   body.innerHTML = `
     <div class="card">
-      <div class="top"><div style="font-weight:700;">பணியாளர்கள் பட்டியல் (${cache.staff.length})</div><button class="btn-primary btn-sm" id="toggleStaffForm" style="width:auto;margin:0;">➕ பணியாளர் சேர்</button></div>
+      <div class="top"><div style="font-weight:700;">பணியாளர்கள் (${cache.staff.length})</div><button class="btn-primary btn-sm" id="toggleStaffForm" style="width:auto;margin:0;">+ சேர்</button></div>
       <div id="staffForm" class="hidden" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
-        <label>பணியாளர் பெயர்</label><input id="sname" placeholder="எ.கா: சரவணன்">
-        <label>பதவி / வேலை</label><input id="srole" placeholder="எ.கா: Computer Operator">
-        <label>தொலைபேசி எண்</label><input id="sphone" type="tel" placeholder="9876543210">
-        <label>Login ID (ஆங்கிலத்தில்)</label><input id="slogin" placeholder="எ.கா: saravanan">
-        <label>கடவுச்சொல்</label><input id="spass" type="password" placeholder="••••••••">
-        <label>மாத சம்பளம் (₹)</label><input id="ssal" type="number" placeholder="0">
-        <label>பணியாளர் புகைப்படம் (Photo)</label><input id="sphoto" type="file" accept="image/*">
-        <button class="btn-primary" id="saveStaff">💾 பணியாளரைச் சேமி</button>
+        <label>பெயர்</label><input id="sname">
+        <label>பதவி</label><input id="srole" placeholder="Staff">
+        <label>தொலைபேசி</label><input id="sphone">
+        <label>Login ID</label><input id="slogin">
+        <label>கடவுச்சொல்</label><input id="spass" type="password">
+        <label>மாத சம்பளம் (₹)</label><input id="ssal" type="number">
+        <label>புகைப்படம்</label><input id="sphoto" type="file" accept="image/*">
+        <button class="btn-primary" id="saveStaff">பணியாளரைச் சேமி</button>
       </div>
       ${cache.staff.length? cache.staff.map(s=>`
         <div class="entry">
           <div style="display:flex;align-items:center;gap:12px;">
             ${s.photo? `<img src="${s.photo}" class="user-avatar">` : `<div class="avatar-ph">${(s.name||s.username)[0].toUpperCase()}</div>`}
             <div>
-              <div style="font-weight:800;font-size:15px;">${escapeHtml(s.name||s.username)}</div>
-              <div class="meta">ID: <b>${s.username}</b> · ${escapeHtml(s.role\vert{}\vert{}'Staff')} ·${fmt(s.salary||0)}</div>
+              <div style="font-weight:800;">${escapeHtml(s.name||s.username)}</div>
+              <div class="meta">ID: <b>${s.username}</b> ·${fmt(s.salary||0)}</div>
             </div>
           </div>
           <div style="display:flex;gap:6px;">
-            <button class="btn-outline btn-sm" data-editstaff="${s.username}">✏️</button>
-            <button class="del-btn btn-sm" data-delstaff="${s.username}">🗑️</button>
+            <button class="btn-outline btn-sm" data-editstaff="${s.username}">திருத்து</button>
+            <button class="btn-danger btn-sm" data-delstaff="${s.username}">நீக்கு</button>
           </div>
         </div>`).join('') : '<div class="small">பணியாளர்கள் யாரும் இல்லை</div>'}
     </div>
@@ -542,14 +518,14 @@ function renderStaffMgmt(body){
   };
 
   document.getElementById('saveStaff').onclick=async()=>{
-    const name=document.getElementById('sname').value.trim();
-    const role=document.getElementById('srole').value.trim()||'Staff';
-    const phone=document.getElementById('sphone').value.trim();
-    let login=document.getElementById('slogin').value.trim().toLowerCase().replace(/\s+/g,'');
-    const pass=document.getElementById('spass').value;
-    const sal=parseFloat(document.getElementById('ssal').value)||0;
-    if(!name){alert('பெயர் தேவை'); return;}
-    if(!login) login='st_'+uid().slice(-4);
+    const name = document.getElementById('sname').value.trim();
+    const role = document.getElementById('srole').value.trim()||'Staff';
+    const phone = document.getElementById('sphone').value.trim();
+    let login = document.getElementById('slogin').value.trim().toLowerCase().replace(/\s+/g,'');
+    const pass = document.getElementById('spass').value;
+    const sal = parseFloat(document.getElementById('ssal').value)||0;
+    if(!name){ alert('பெயர் தேவை'); return; }
+    if(!login) login = 'st_' + uid().slice(-4);
     await dbc.doc(P('staff/'+login)).set({name, role, phone, password:pass, salary:sal, photo:base64Photo, deleted:false});
     await refreshAll(); render();
   };
@@ -564,7 +540,7 @@ function renderStaffMgmt(body){
 
   document.querySelectorAll('[data-editstaff]').forEach(b=>{
     b.onclick=async()=>{
-      const target=cache.staff.find(s=>s.username===b.dataset.editstaff);
+      const target = cache.staff.find(s=>s.username===b.dataset.editstaff);
       const newName = prompt('புதிய பெயர்:', target.name||target.username);
       if(!newName) return;
       const newSal = prompt('புதிய சம்பளம் (₹):', target.salary||0);
@@ -585,19 +561,19 @@ async function renderOwnerTrash(body){
 
   body.innerHTML = `
     <div class="card">
-      <div style="font-weight:700;color:var(--red);margin-bottom:8px;">♻️ நீக்கப்பட்ட பதிவுகள் (${eList.length})</div>
+      <div style="font-weight:700;color:var(--red);margin-bottom:8px;">நீக்கப்பட்ட பதிவுகள் (${eList.length})</div>
       ${eList.length? eList.map(e=>`
         <div class="entry">
           <div><div style="font-weight:700;">${escapeHtml(e.desc)} (${fmt(e.amt)})</div><div class="meta">${e.date}</div></div>
-          <button class="restore-btn btn-sm" data-rentry="${e.id}">♻️ மீட்டெடு</button>
+          <button class="btn-success btn-sm" data-rentry="${e.id}">மீட்டெடு</button>
         </div>`).join('') : '<div class="small">நீக்கப்பட்ட பதிவுகள் இல்லை</div>'}
     </div>
     <div class="card">
-      <div style="font-weight:700;color:var(--red);margin-bottom:8px;">♻️ நீக்கப்பட்ட பணியாளர்கள் (${sList.length})</div>
+      <div style="font-weight:700;color:var(--red);margin-bottom:8px;">நீக்கப்பட்ட பணியாளர்கள் (${sList.length})</div>
       ${sList.length? sList.map(s=>`
         <div class="entry">
           <div><div style="font-weight:700;">${escapeHtml(s.name||s.username)}</div><div class="meta">ID: ${s.username}</div></div>
-          <button class="restore-btn btn-sm" data-rstaff="${s.username}">♻️ மீட்டெடு</button>
+          <button class="btn-success btn-sm" data-rstaff="${s.username}">மீட்டெடு</button>
         </div>`).join('') : '<div class="small">நீக்கப்பட்ட பணியாளர்கள் இல்லை</div>'}
     </div>
   `;
@@ -619,19 +595,19 @@ async function renderOwnerTrash(body){
 function renderSettings(body){
   body.innerHTML = `
     <div class="card">
-      <div style="font-weight:700;margin-bottom:8px;">🏷️ கடை பெயர் திருத்து</div>
+      <div style="font-weight:700;margin-bottom:8px;">கடை பெயர் திருத்து</div>
       <input id="set_bname" value="${escapeHtml(APP_NAME)}">
-      <button class="btn-primary" id="saveBName">💾 பெயரைச் சேமி</button>
+      <button class="btn-primary" id="saveBName">பெயரைச் சேமி</button>
     </div>
     <div class="card">
-      <div style="font-weight:700;margin-bottom:8px;">🔑 ஓனர் கடவுச்சொல் மாற்ற</div>
+      <div style="font-weight:700;margin-bottom:8px;">கடவுச்சொல் மாற்ற</div>
       <label>Login ID</label><input id="o_uid" value="${cache.owner.ownerUsername}">
       <label>புதிய கடவுச்சொல்</label><input id="o_pwd" type="password" value="${cache.owner.ownerPassword}">
-      <button class="btn-primary" id="saveOPass">🔒 கடவுச்சொல் சேமி</button>
+      <button class="btn-primary" id="saveOPass">சேமி</button>
     </div>
   `;
   document.getElementById('saveBName').onclick=async()=>{
-    const n=document.getElementById('set_bname').value.trim();
+    const n = document.getElementById('set_bname').value.trim();
     if(!n) return;
     const curId = (masterSession && masterViewBizId) ? masterViewBizId : bizId;
     await dbc.doc('businesses/'+curId).update({name:n});
@@ -639,7 +615,7 @@ function renderSettings(body){
     location.reload();
   };
   document.getElementById('saveOPass').onclick=async()=>{
-    const u=document.getElementById('o_uid').value.trim(), p=document.getElementById('o_pwd').value;
+    const u = document.getElementById('o_uid').value.trim(), p = document.getElementById('o_pwd').value;
     if(!u||!p) return;
     await dbc.doc(P('config/auth')).set({ownerUsername:u, ownerPassword:p});
     alert('கடவுச்சொல் மாற்றப்பட்டது!');
@@ -658,12 +634,12 @@ function renderStaff(){
           <div class="meta">${APP_NAME} · ${escapeHtml(myStaff.role||'Staff')}</div>
         </div>
       </div>
-      <button class="btn-outline btn-sm" id="logoutBtn">🚪 லாக்அவுட்</button>
+      <button class="btn-outline btn-sm" id="logoutBtn">லாக்அவுட்</button>
     </div>
 
     <div class="row" style="margin-bottom:12px;">
-      <button class="btn-purple btn-sm" id="viewIdCardBtn">🪪 எனது ஐடி கார்டு (ID Card)</button>
-      <button class="btn-outline btn-sm" id="uploadMyPhotoBtn">📷 போட்டோ மாற்று</button>
+      <button class="btn-outline btn-sm" id="viewIdCardBtn">ஐடி கார்டு</button>
+      <button class="btn-outline btn-sm" id="uploadMyPhotoBtn">போட்டோ மாற்று</button>
       <input type="file" id="myPhotoInput" accept="image/*" class="hidden">
     </div>
 
@@ -685,17 +661,17 @@ function renderStaff(){
         </div>
         <div class="id-footer">Authorized Signatory · Valid ID</div>
       </div>
-      <button class="btn-success" id="downloadIdCardBtn" style="margin-bottom:12px;">📥 ஐடி கார்டை டவுன்லோட் செய்</button>
+      <button class="btn-success" id="downloadIdCardBtn" style="margin-bottom:12px;">ஐடி கார்டை பதிவிறக்கு</button>
     </div>
 
     ${bizTabs()}
     <div class="card">
       <div class="row">
-        <div><label>வகை</label><select id="etype"><option value="in">📥 வரவு (+)</option><option value="out">📤 செலவு (-)</option></select></div>
-        <div><label>தொகை (₹)</label><input id="eamt" type="number" inputmode="decimal" placeholder="0"></div>
+        <div><label>வகை</label><select id="etype"><option value="in">வரவு (+)</option><option value="out">செலவு (-)</option></select></div>
+        <div><label>தொகை (₹)</label><input id="eamt" type="number" inputmode="decimal"></div>
       </div>
-      <label>விவரம்</label><input id="edesc" placeholder="விவரம் எழுதவும்">
-      <button class="btn-primary" id="addBtn">➕ பதிவு சேர்</button>
+      <label>விவரம்</label><input id="edesc">
+      <button class="btn-primary" id="addBtn">பதிவு சேர்</button>
     </div>
     <div class="card">
       <div style="font-weight:700;margin-bottom:8px;">உங்கள் சமீபத்திய பதிவுகள்</div>
@@ -727,18 +703,18 @@ function renderStaff(){
     if(e.target.files && e.target.files[0]){
       compressImage(e.target.files[0], async (b64)=>{
         await dbc.doc(P('staff/'+session.username)).update({photo:b64});
-        alert('போட்டோ வெற்றிகரமாக மாற்றப்பட்டது!');
+        alert('போட்டோ மாற்றப்பட்டது!');
         await refreshAll(); render();
       });
     }
   };
 
-  document.getElementById('logoutBtn').onclick=()=>{session=null; render();};
+  document.getElementById('logoutBtn').onclick=()=>{ session=null; render(); };
   document.getElementById('addBtn').onclick=async()=>{
-    const amt=parseFloat(document.getElementById('eamt').value);
-    const type=document.getElementById('etype').value;
-    const desc=document.getElementById('edesc').value.trim();
-    if(!amt||amt<=0){alert('தொகை உள்ளிடவும்'); return;}
+    const amt = parseFloat(document.getElementById('eamt').value);
+    const type = document.getElementById('etype').value;
+    const desc = document.getElementById('edesc').value.trim();
+    if(!amt||amt<=0){ alert('தொகை உள்ளிடவும்'); return; }
     await dbc.collection(P('entries')).add({biz:activeBiz, type, amt, desc, date:todayStr(), ts:Date.now(), by:session.username, deleted:false});
     await refreshAll(); render();
   };
