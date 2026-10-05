@@ -6,18 +6,12 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a73e8",
-  "description": "Digital Services & E-Seva Management App",
+  "description": "Digital Services &amp; E-Seva Management App",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/192/3135/3135715.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'&gt;&lt;rect width='512' height='512' rx='100' fill='%231a73e8'/&gt;&lt;text x='50%25' y='55%25' font-size='220' font-weight='bold' fill='white' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif'&gt;ID&lt;/text&gt;&lt;/svg&gt;",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
