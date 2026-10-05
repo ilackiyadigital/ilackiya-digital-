@@ -117,14 +117,6 @@ firebase.initializeApp(firebaseConfig);
 
 let dbc = firebase.firestore();
 
-// ஆஃப்லைன் சப்போர்ட் (Offline Persistence)
-try {
-  dbc.enablePersistence({synchronizeTabs:true}).catch(err=>{
-    if (err.code == 'failed-precondition') console.log('Multiple tabs open');
-    else if (err.code == 'unimplemented') console.log('Browser not supported');
-  });
-} catch(e){}
-
 const DEFAULT_BIZ = [
   {id:'eservice', name:'ஈ சேவை மையம்', icon:'🖥️', color:'#2563eb'},
   {id:'xerox', name:'ஜெராக்ஸ் கடை', icon:'📠', color:'#ea580c'},
@@ -147,7 +139,6 @@ function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 
 let APP_NAME='Business App';
 
-// படத்தை சுருக்கி Base64-ஆக மாற்றும் ஃபங்ஷன்
 function compressImage(file, callback){
   const reader = new FileReader();
   reader.readAsDataURL(file);
@@ -173,6 +164,12 @@ function compressImage(file, callback){
 
 async function init(){
   try{
+    const isMaster = new URLSearchParams(location.search).get('master') === '1';
+    if(isMaster && !masterSession){
+      renderMasterLogin();
+      return;
+    }
+
     if(bizId || (masterSession && masterViewBizId)){
       const authSnap = await dbc.doc(P('config/auth')).get();
       if(!authSnap.exists){
@@ -181,30 +178,33 @@ async function init(){
       await refreshAll();
     }
   }catch(e){
-    app.innerHTML = `<div class="card" style="color:var(--red);">இணைப்பு பிழை: ${escapeHtml(e.message||String(e))}</div>`;
-    return;
+    console.error("Init Error:", e);
   }
   render();
 }
 
 async function refreshAll(){
-  const [authSnap, staffQ, entQ] = await Promise.all([
-    dbc.doc(P('config/auth')).get(),
-    dbc.collection(P('staff')).get(),
-    dbc.collection(P('entries')).orderBy('ts','desc').limit(1000).get()
-  ]);
-  cache.owner = authSnap.data() || {ownerUsername:'owner', ownerPassword:'owner123'};
-  cache.staff = staffQ.docs.map(d=>({username:d.id, ...d.data()})).filter(s=>!s.deleted);
-  cache.entries = entQ.docs.map(d=>({id:d.id, ...d.data()})).filter(e=>!e.deleted);
-
   try{
+    const [authSnap, staffQ, entQ] = await Promise.all([
+      dbc.doc(P('config/auth')).get(),
+      dbc.collection(P('staff')).get(),
+      dbc.collection(P('entries')).orderBy('ts','desc').limit(1000).get()
+    ]);
+    cache.owner = authSnap.data() || {ownerUsername:'owner', ownerPassword:'owner123'};
+    cache.staff = staffQ.docs.map(d=>({username:d.id, ...d.data()})).filter(s=>!s.deleted);
+    cache.entries = entQ.docs.map(d=>({id:d.id, ...d.data()})).filter(e=>!e.deleted);
+
     const curId = (masterSession && masterViewBizId) ? masterViewBizId : bizId;
-    const bizDoc = await dbc.doc('businesses/'+curId).get();
-    if(bizDoc.exists && bizDoc.data().name){
-      APP_NAME = bizDoc.data().name;
-      document.title = APP_NAME;
+    if(curId){
+      const bizDoc = await dbc.doc('businesses/'+curId).get();
+      if(bizDoc.exists && bizDoc.data().name){
+        APP_NAME = bizDoc.data().name;
+        document.title = APP_NAME;
+      }
     }
-  }catch(e){}
+  }catch(e){
+    console.error("Refresh Error:", e);
+  }
 }
 
 function render(){
@@ -661,7 +661,6 @@ function renderStaff(){
       <button class="btn-outline btn-sm" id="logoutBtn">🚪 லாக்அவுட்</button>
     </div>
 
-    <!-- ஐடி கார்டு & போட்டோ மாற்றுதல் பட்டன் -->
     <div class="row" style="margin-bottom:12px;">
       <button class="btn-purple btn-sm" id="viewIdCardBtn">🪪 எனது ஐடி கார்டு (ID Card)</button>
       <button class="btn-outline btn-sm" id="uploadMyPhotoBtn">📷 போட்டோ மாற்று</button>
@@ -686,7 +685,7 @@ function renderStaff(){
         </div>
         <div class="id-footer">Authorized Signatory · Valid ID</div>
       </div>
-      <button class="btn-success" id="downloadIdCardBtn" style="margin-bottom:12px;">📥 ஐடி கார்டை டவுன்லோட் செய் (Download)</button>
+      <button class="btn-success" id="downloadIdCardBtn" style="margin-bottom:12px;">📥 ஐடி கார்டை டவுன்லோட் செய்</button>
     </div>
 
     ${bizTabs()}
@@ -709,12 +708,10 @@ function renderStaff(){
   `;
   attachBizTabs();
 
-  // ஐடி கார்டு திறந்து மூடுதல்
   document.getElementById('viewIdCardBtn').onclick=()=>{
     document.getElementById('idCardModal').classList.toggle('hidden');
   };
 
-  // ஐடி கார்டை படமாக (PNG) டவுன்லோட் செய்தல்
   document.getElementById('downloadIdCardBtn').onclick=()=>{
     const cardEl = document.getElementById('printableIdCard');
     html2canvas(cardEl, {scale:3}).then(canvas => {
@@ -725,7 +722,6 @@ function renderStaff(){
     });
   };
 
-  // ஸ்டாஃப் தானே போட்டோ மாற்றுதல்
   document.getElementById('uploadMyPhotoBtn').onclick=()=>document.getElementById('myPhotoInput').click();
   document.getElementById('myPhotoInput').onchange = function(e){
     if(e.target.files && e.target.files[0]){
