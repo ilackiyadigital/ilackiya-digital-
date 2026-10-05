@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>இலக்கியா டிஜிட்டல்</title>
+<title>Business App</title>
 <style>
 :root{
   --bg:#f4f6fb; --card:#ffffff; --text:#1e2430; --sub:#6b7280;
@@ -113,14 +113,14 @@ function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',
 function monthStr(d){return (d||todayStr()).slice(0,7);}
 function escapeHtml(s){return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-let APP_NAME='இலக்கியா டிஜிட்டல்';
+let APP_NAME='Business App';
 function applyTheme(t){
   const r=document.documentElement.style;
   const d={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777'};
   const x=Object.assign({},d,t||{});
   r.setProperty('--grad1',x.grad1); r.setProperty('--grad2',x.grad2); r.setProperty('--accent',x.grad1);
   r.setProperty('--biz1',x.biz1); r.setProperty('--biz2',x.biz2); r.setProperty('--biz3',x.biz3);
-  APP_NAME = x.appName || 'இலக்கியா டிஜிட்டல்';
+  APP_NAME = x.appName || 'Business App';
   document.title = APP_NAME;
 }
 async function init(){
@@ -134,22 +134,21 @@ async function init(){
       await refreshAll();
     }
   }catch(e){
-    app.innerHTML = `<h1>இலக்கியா டிஜிட்டல்</h1>
+    app.innerHTML = `<h1>Business App</h1>
     <div class="card"><div class="err">இணைப்பு பிழை: ${escapeHtml(e.message||String(e))}</div></div>`;
     return;
   }
   render();
 }
 async function refreshAll(){
-  const [authSnap, staffQ, entQ, attQ, payQ, reqQ, locSnap, themeSnap] = await Promise.all([
+  const [authSnap, staffQ, entQ, attQ, payQ, reqQ, locSnap] = await Promise.all([
     dbc.doc(P('config/auth')).get(),
     dbc.collection(P('staff')).get(),
     dbc.collection(P('entries')).orderBy('ts','desc').limit(1000).get(),
     dbc.collection(P('attendance')).orderBy('date','desc').limit(500).get(),
     dbc.collection(P('salaryPayments')).orderBy('date','desc').limit(500).get(),
     dbc.collection(P('requests')).get(),
-    dbc.doc(P('config/shopLocation')).get(),
-    dbc.doc(P('config/theme')).get()
+    dbc.doc(P('config/shopLocation')).get()
   ]);
   cache.owner = authSnap.data() || {ownerUsername:'owner', ownerPassword:'owner123'};
   cache.staff = staffQ.docs.map(d=>({username:d.id, ...d.data()}));
@@ -164,99 +163,18 @@ async function refreshAll(){
   }catch(e){ BIZ = DEFAULT_BIZ.map(b=>({...b})); }
   if(!BIZ.find(b=>b.id===activeBiz)) activeBiz = BIZ[0] ? BIZ[0].id : null;
   try{ const th=await dbc.doc(P('config/theme')).get(); cache.theme=th.exists?th.data():null; }catch(e){}
+  if(!cache.theme || !cache.theme.appName){
+    try{
+      const curId = (masterSession && masterViewBizId) ? masterViewBizId : bizId;
+      const bizDoc = await dbc.doc('businesses/'+curId).get();
+      if(bizDoc.exists && bizDoc.data().name){ cache.theme = Object.assign({}, cache.theme, {appName: bizDoc.data().name}); }
+    }catch(e){}
+  }
   applyTheme(cache.theme);
-  cache.theme = themeSnap.exists ? themeSnap.data() : null;
-}
-
-const THEME_DEFAULT={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777'};
-const THEME_PRESETS=[
-  {n:'ஊதா-நீலம்',grad1:'#7c3aed',grad2:'#2563eb'},
-  {n:'பச்சை',grad1:'#059669',grad2:'#0d9488'},
-  {n:'ஆரஞ்சு',grad1:'#ea580c',grad2:'#dc2626'},
-  {n:'இளஞ்சிவப்பு',grad1:'#db2777',grad2:'#7c3aed'},
-  {n:'கடல் நீலம்',grad1:'#0284c7',grad2:'#1e3a8a'},
-  {n:'கருப்பு-தங்கம்',grad1:'#1f2937',grad2:'#b45309'}
-];
-function applyTheme(){
-  const t=Object.assign({},THEME_DEFAULT,cache.theme||{});
-  const r=document.documentElement.style;
-  r.setProperty('--grad1',t.grad1); r.setProperty('--grad2',t.grad2);
-  r.setProperty('--accent',t.grad1); r.setProperty('--accent2',t.grad2);
-  r.setProperty('--biz1',t.biz1); r.setProperty('--biz2',t.biz2); r.setProperty('--biz3',t.biz3);
-}
-function renderCategories(body){
-  body.innerHTML = `
-    <div class="card">
-      <div class="sub" style="margin-bottom:8px;">உங்க கடை வகைகள் (Tabs)</div>
-      ${BIZ.map((b,i)=>`
-        <div class="row" style="margin-bottom:8px;align-items:center;">
-          <input type="text" value="${escapeHtml(b.name)}" data-catname="${b.id}" style="flex:2;">
-          <input type="text" value="${b.icon||''}" data-caticon="${b.id}" placeholder="🏪" style="flex:0 0 60px;text-align:center;">
-          <input type="color" value="${b.color||'#2563eb'}" data-catcolor="${b.id}" style="flex:0 0 44px;height:40px;padding:2px;">
-          <button class="del-btn" data-catdel="${b.id}">✕</button>
-        </div>`).join('')}
-      <button class="btn-outline" id="addCatBtn" style="width:100%;margin-top:6px;">+ புது வகை சேர்</button>
-      <button class="btn-primary" id="saveCatBtn">மாற்றங்களை சேமி</button>
-      <div class="small" style="margin-top:8px;">வகையை நீக்கினாலும், அந்த வகையில் ஏற்கனவே போட்ட பதிவுகள் நீங்காது — ஆனா அந்த tab இனி தெரியாது.</div>
-    </div>
-  `;
-  document.getElementById('addCatBtn').onclick=()=>{
-    const color = COLOR_PALETTE[BIZ.length % COLOR_PALETTE.length];
-    BIZ.push({id:uid(), name:'புது வகை', icon:'🏪', color});
-    renderCategories(body);
-  };
-  document.querySelectorAll('[data-catdel]').forEach(b=>{
-    b.onclick=()=>{
-      if(BIZ.length<=1){ alert('குறைந்தது ஒரு வகை இருக்கணும்'); return; }
-      BIZ = BIZ.filter(x=>x.id!==b.dataset.catdel);
-      renderCategories(body);
-    };
-  });
-  document.getElementById('saveCatBtn').onclick=async()=>{
-    BIZ.forEach(b=>{
-      const n=document.querySelector('[data-catname="'+b.id+'"]');
-      const ic=document.querySelector('[data-caticon="'+b.id+'"]');
-      const c=document.querySelector('[data-catcolor="'+b.id+'"]');
-      if(n) b.name=n.value.trim()||b.name;
-      if(ic) b.icon=ic.value.trim()||'🏪';
-      if(c) b.color=c.value;
-    });
-    await dbc.doc(P('config/categories')).set({list:BIZ});
-    if(!BIZ.find(x=>x.id===activeBiz)) activeBiz=BIZ[0].id;
-    alert('வகைகள் சேமிக்கப்பட்டன.');
-    render();
-  };
-}
-
-function renderTheme(body){
-  const t=Object.assign({},THEME_DEFAULT,cache.theme||{});
-  body.innerHTML=`
-    <div class="card">
-      <div class="sub" style="margin-bottom:6px;">🎨 தயாரான தீம்கள் (தட்டினா உடனே மாறும்)</div>
-      <div class="presets">${THEME_PRESETS.map((p,i)=>`<div class="tab" data-preset="${i}" style="background:linear-gradient(135deg,${p.grad1},${p.grad2});color:#fff;border:none;">${p.n}</div>`).join('')}</div>
-    </div>
-    <div class="card">
-      <div class="sub" style="margin-bottom:6px;">உங்க இஷ்டப்படி நிறங்கள்</div>
-      <div class="row"><div><label>மேல் பட்டை நிறம் 1</label><input type="color" id="c_grad1" value="${t.grad1}" style="height:44px;padding:2px;"></div>
-      <div><label>மேல் பட்டை நிறம் 2</label><input type="color" id="c_grad2" value="${t.grad2}" style="height:44px;padding:2px;"></div></div>
-      <div class="row"><div><label>🖥️ ஈ சேவை</label><input type="color" id="c_biz1" value="${t.biz1}" style="height:44px;padding:2px;"></div>
-      <div><label>📠 ஜெராக்ஸ்</label><input type="color" id="c_biz2" value="${t.biz2}" style="height:44px;padding:2px;"></div>
-      <div><label>📷 போட்டோ</label><input type="color" id="c_biz3" value="${t.biz3}" style="height:44px;padding:2px;"></div></div>
-      <button class="btn-primary" id="saveTheme">நிறங்களை சேமி</button>
-      <button class="btn-outline" id="resetTheme" style="width:100%;margin-top:8px;">பழைய நிறங்களுக்கு மாற்று</button>
-    </div>`;
-  const save=async(obj)=>{ await dbc.doc(P('config/theme')).set(obj); await refreshAll(); render(); };
-  document.querySelectorAll('[data-preset]').forEach(b=>{
-    b.onclick=()=>{ const p=THEME_PRESETS[b.dataset.preset]; save({...t,grad1:p.grad1,grad2:p.grad2}); };
-  });
-  document.getElementById('saveTheme').onclick=()=>save({
-    grad1:document.getElementById('c_grad1').value, grad2:document.getElementById('c_grad2').value,
-    biz1:document.getElementById('c_biz1').value, biz2:document.getElementById('c_biz2').value, biz3:document.getElementById('c_biz3').value});
-  document.getElementById('resetTheme').onclick=()=>save({...THEME_DEFAULT});
 }
 
 function render(){
-  applyTheme();
+  applyTheme(cache.theme);
   if(masterSession && !masterViewBizId){ renderMaster(); return; }
   if(masterSession && masterViewBizId){ renderOwner(); return; }
   if(!masterSession && new URLSearchParams(location.search).get('master')==='1'){ renderMasterLogin(); return; }
@@ -868,7 +786,7 @@ function renderAttendanceView(body){
 }
 
 function renderTheme(body){
-  const d={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777',appName:'இலக்கியா டிஜிட்டல்'};
+  const d={grad1:'#7c3aed',grad2:'#2563eb',biz1:'#2563eb',biz2:'#ea580c',biz3:'#db2777',appName:''};
   const t=Object.assign({},d,cache.theme||{});
   const presets=[['ஊதா-நீலம்','#7c3aed','#2563eb'],['பச்சை','#059669','#0d9488'],['ஆரஞ்சு-சிவப்பு','#ea580c','#dc2626'],['இளஞ்சிவப்பு','#db2777','#9333ea'],['கருநீலம்','#1e3a8a','#0ea5e9']];
   const fields=[['grad1','முக்கிய நிறம் 1 (Header/பட்டன்)'],['grad2','முக்கிய நிறம் 2'],['biz1','🖥️ ஈ சேவை மையம்'],['biz2','📠 ஜெராக்ஸ் கடை'],['biz3','📷 போட்டோ ஸ்டூடியோ']];
@@ -888,7 +806,7 @@ function renderTheme(body){
       <button class="btn-primary" id="saveTheme">நிறங்களை சேமி</button>
       <button class="btn-outline" id="resetTheme" style="width:100%;margin-top:8px;">பழைய நிறத்துக்கு மாற்று</button>
     </div>`;
-  const read=()=>{const o=Object.fromEntries(fields.map(f=>[f[0],document.getElementById('c_'+f[0]).value])); o.appName=document.getElementById('c_appName').value||'இலக்கியா டிஜிட்டல்'; return o;};
+  const read=()=>{const o=Object.fromEntries(fields.map(f=>[f[0],document.getElementById('c_'+f[0]).value])); o.appName=document.getElementById('c_appName').value||'Business App'; return o;};
   fields.forEach(f=>document.getElementById('c_'+f[0]).oninput=()=>applyTheme(read()));
   document.querySelectorAll('[data-preset]').forEach(b=>{b.onclick=()=>{
     const p=presets[b.dataset.preset];
