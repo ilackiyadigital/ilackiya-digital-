@@ -9,14 +9,10 @@
   "description": "Digital Services & E-Seva Management App",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://via.placeholder.com/512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231a73e8'/><text x='50%25' y='55%25' font-size='220' font-weight='bold' fill='white' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif'>ID</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
