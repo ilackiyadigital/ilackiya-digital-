@@ -399,7 +399,7 @@ function renderLogin(devRole){
   };
 }
 
-function bizTabs(){ return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.id===activeBiz?'active':''}" data-biz="${b.id}">${b.icon\vert{}\vert{}'🏪'} ${escapeHtml(b.name)}</div>`).join('')}</div>`; }
+function bizTabs(){ return `<div class="tabs">${BIZ.map(b=>`<div class="tab ${b.id===activeBiz?'active':''}" data-biz="${b.id}">${b.icon \vert{}\vert{} '🏪'} ${escapeHtml(b.name)}</div>`).join('')}</div>`; }
 function attachBizTabs(){ document.querySelectorAll('.tab[data-biz]').forEach(t=>{ t.onclick=()=>{ activeBiz=t.dataset.biz; render(); }; }); }
 
 function renderOwner(){
