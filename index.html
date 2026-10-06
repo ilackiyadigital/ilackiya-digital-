@@ -134,6 +134,35 @@ function P(path){
   return "businesses/"+id+"/"+path;
 }
 
+/* =========================
+   ATTENDANCE
+========================= */
+async function recordStaffAttendance(username){
+  if(!username) return;
+  const date=todayStr();
+  const ref=dbc.doc(P("attendance/"+date+"_"+username));
+  const now=Date.now();
+  try{
+    const snap=await withTimeout(ref.get());
+    if(snap.exists){
+      await withTimeout(ref.set({username,date,lastLoginTs:now,status:"present"},{merge:true}));
+    }else{
+      await withTimeout(ref.set({username,date,checkInTs:now,lastLoginTs:now,status:"present"}));
+    }
+  }catch(e){
+    console.warn("Attendance save:",e);
+    throw new Error("Attendance பதிவு செய்ய முடியவில்லை. Internet / Firestore Rules சரிபார்க்கவும்.");
+  }
+}
+function dateRangeEntries(from,to){
+  return cache.entries.filter(e=>{const d=String(e.date||"");return (!from||d>=from)&&(!to||d<=to);});
+}
+function monthBounds(ym){
+  const [y,m]=ym.split("-").map(Number);
+  const days=new Date(y,m,0).getDate();
+  return {from:ym+"-01",to:ym+"-"+String(days).padStart(2,"0"),days};
+}
+
 function compressImage(file,callback){
   const reader=new FileReader();
   reader.onload=function(ev){
@@ -481,15 +510,18 @@ function renderLogin(devRole){
     if(owner){
       if(u===cache.owner.ownerUsername&&p===cache.owner.ownerPassword){
         session={role:"owner"};
-        try{const d=new Date();await withTimeout(dbc.collection(P("loginReports")).add({username:u,role:"Owner",date:todayStr(),time:d.toLocaleTimeString("en-IN"),ts:Date.now()}));}catch(logErr){console.warn("Owner login report:",logErr)}
         render();return;
       }
     }else{
       const s=cache.staff.find(x=>x.username===u&&x.password===p);
       if(s){
-        session={role:"staff",username:u};
-        try{const d=new Date();await withTimeout(dbc.collection(P("loginReports")).add({username:u,role:"Staff",date:todayStr(),time:d.toLocaleTimeString("en-IN"),ts:Date.now()}));}catch(logErr){console.warn("Staff login report:",logErr)}
-        render();return
+        try{
+          await recordStaffAttendance(u);
+          session={role:"staff",username:u};
+          render();return;
+        }catch(attErr){
+          err.textContent=attErr.message||"Attendance பதிவு செய்ய முடியவில்லை.";return;
+        }
       }
     }
     err.textContent="தவறான Login ID அல்லது கடவுச்சொல்.";
@@ -625,39 +657,63 @@ function renderStaffMgmt(body){
   document.querySelectorAll("[data-editstaff]").forEach(b=>b.onclick=async()=>{
     const s=cache.staff.find(x=>x.username===b.dataset.editstaff);if(!s)return;
     const name=prompt("புதிய பெயர்:",s.name||s.username);if(!name)return;
-    const sal=prompt("புதிய சம்பளம் (₹):",s.salary||0);
-    try{await dbc.doc(P("staff/"+b.dataset.editstaff)).update({name:name.trim(),salary:parseFloat(sal)||0});await refreshAll();render()}catch(e){alert(e.message)}
+    const role=prompt("பதவி:",s.role||"Staff");if(role===null)return;
+    const phone=prompt("தொலைபேசி:",s.phone||"");if(phone===null)return;
+    const sal=prompt("மாத சம்பளம் (₹):",s.salary||0);
+    const newPass=prompt("கடவுச்சொல் (மாற்ற வேண்டாம் என்றால் காலியாக விடவும்):","");
+    const data={name:name.trim(),role:role.trim()||"Staff",phone:phone.trim(),salary:parseFloat(sal)||0};
+    if(newPass)data.password=newPass;
+    try{await dbc.doc(P("staff/"+b.dataset.editstaff)).update(data);await refreshAll();render()}catch(e){alert(e.message)}
   });
 }
 
 async function renderOwnerReport(body){
-  const all=cache.entries.slice().sort((a,b)=>Number(b.ts||0)-Number(a.ts||0));
-  const inT=all.filter(e=>e.type==="in").reduce((s,e)=>s+Number(e.amt||0),0);
-  const outT=all.filter(e=>e.type==="out").reduce((s,e)=>s+Number(e.amt||0),0);
-  const activeStaff=cache.staff.length;
-  let logins=[];
-  try{
-    const q=await withTimeout(dbc.collection(P("loginReports")).get());
-    logins=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>Number(b.ts||0)-Number(a.ts||0)).slice(0,50);
-  }catch(e){console.warn("login report:",e)}
+  const today=todayStr(), month=today.slice(0,7);
   body.innerHTML=`
-    <div class="card">
-      <div style="font-weight:800;font-size:17px;margin-bottom:10px">📊 Owner Login Report</div>
-      <div class="small" style="margin-bottom:12px">இந்த கடையின் வரவு-செலவு மற்றும் Login activity அறிக்கை.</div>
-      <div class="totals">
-        <div class="tbox in"><div>மொத்த வரவு</div><div class="n">${fmt(inT)}</div></div>
-        <div class="tbox out"><div>மொத்த செலவு</div><div class="n">${fmt(outT)}</div></div>
-        <div class="tbox net"><div>இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div>
-      </div>
-      <div class="row">
-        <div class="card" style="margin:0;padding:10px;text-align:center"><div class="small">பதிவுகள்</div><b>${all.length}</b></div>
-        <div class="card" style="margin:0;padding:10px;text-align:center"><div class="small">பணியாளர்கள்</div><b>${activeStaff}</b></div>
-      </div>
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">📊 வரவு–செலவு ரிப்போர்ட்</div>
+      <div class="row"><div><label>தொடக்க தேதி</label><input id="reportFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="reportTo" type="date" value="${today}"></div></div>
+      <button class="btn-primary" id="runFinanceReport">ரிப்போர்ட் பார்க்க</button><div id="financeReportBox" style="margin-top:12px"></div>
     </div>
-    <div class="card">
-      <div style="font-weight:800;margin-bottom:8px">🔐 Login Activity</div>
-      ${logins.length?logins.map(x=>`<div class="entry"><div><div style="font-weight:700">${escapeHtml(x.username||x.role||"-" )}</div><div class="meta">${escapeHtml(x.role||"-")} · ${escapeHtml(x.date||"-")}</div></div><div class="meta">${escapeHtml(x.time||"")}</div></div>`).join(""):'<div class="small">Login Report இன்னும் இல்லை.</div>'}
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">👥 பணியாளர் Attendance ரிப்போர்ட்</div>
+      <div class="small" style="margin-bottom:8px">பணியாளர் Login செய்த உடனே அந்த நாளுக்கான Attendance தானாக பதிவு ஆகும். ஒரே நாளில் பல Login செய்தாலும் ஒரு நாளாக மட்டுமே கணக்காகும்.</div>
+      <div class="row"><div><label>தொடக்க தேதி</label><input id="attFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="attTo" type="date" value="${today}"></div></div>
+      <button class="btn-primary" id="runAttendanceReport">Attendance Report பார்க்க</button><div id="attendanceReportBox" style="margin-top:12px"></div>
+    </div>
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">💰 வருகைக்கேற்ப சம்பள கணக்கு</div>
+      <label>சம்பள மாதம்</label><input id="salaryMonth" type="month" value="${month}">
+      <button class="btn-primary" id="runSalaryReport">சம்பள கணக்கு பார்க்க</button><div id="salaryReportBox" style="margin-top:12px"></div>
+      <div class="small" style="margin-top:8px">கணக்கு: மாத சம்பளம் ÷ அந்த மாதத்தின் மொத்த நாட்கள் × Attendance நாட்கள்.</div>
     </div>`;
+
+  const runFinance=()=>{
+    const from=document.getElementById("reportFrom").value,to=document.getElementById("reportTo").value;
+    if(from&&to&&from>to){alert("தொடக்க தேதி முடிவு தேதியை விட பெரியதாக இருக்கக்கூடாது.");return;}
+    const all=dateRangeEntries(from,to).filter(e=>e.biz===activeBiz);
+    const inT=all.filter(e=>e.type==="in").reduce((s,e)=>s+Number(e.amt||0),0), outT=all.filter(e=>e.type==="out").reduce((s,e)=>s+Number(e.amt||0),0);
+    document.getElementById("financeReportBox").innerHTML=`<div class="totals"><div class="tbox in"><div>வரவு</div><div class="n">${fmt(inT)}</div></div><div class="tbox out"><div>செலவு</div><div class="n">${fmt(outT)}</div></div><div class="tbox net"><div>இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div></div><div style="font-weight:700;margin-bottom:6px">${escapeHtml(from||"-")} முதல் ${escapeHtml(to||"-")} வரை · ${all.length} பதிவுகள்</div>${all.length?all.map(e=>`<div class="entry"><div><div style="font-weight:700">${escapeHtml(e.desc||"-")}</div><div class="meta">${escapeHtml(e.date||"-")} · ${escapeHtml(e.by||"-")}</div></div><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div></div>`).join(""):'<div class="small">இந்த தேதிகளில் பதிவு இல்லை.</div>'}`;
+  };
+  document.getElementById("runFinanceReport").onclick=runFinance; runFinance();
+
+  const loadAttendance=async()=>{
+    const from=document.getElementById("attFrom").value,to=document.getElementById("attTo").value;
+    if(from&&to&&from>to){alert("தொடக்க தேதி முடிவு தேதியை விட பெரியதாக இருக்கக்கூடாது.");return;}
+    try{
+      const q=await withTimeout(dbc.collection(P("attendance")).where("date",">=",from||"0000-01-01").where("date","<=",to||"9999-12-31").get());
+      const rows=q.docs.map(d=>d.data()), grouped={}; rows.forEach(r=>{grouped[r.username]=(grouped[r.username]||0)+1;});
+      document.getElementById("attendanceReportBox").innerHTML=`${cache.staff.length?cache.staff.map(s=>{const days=grouped[s.username]||0;return `<div class="entry"><div><div style="font-weight:800">${escapeHtml(s.name||s.username)}</div><div class="meta">ID: ${escapeHtml(s.username)} · ${escapeHtml(s.role||"Staff")}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--green)">${days} நாள்</div><div class="meta">Present</div></div></div>`}).join(""):'<div class="small">பணியாளர்கள் இல்லை.</div>'}<div class="small" style="margin-top:8px">மொத்த Attendance பதிவுகள்: ${rows.length}</div>`;
+    }catch(e){document.getElementById("attendanceReportBox").innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
+  };
+  document.getElementById("runAttendanceReport").onclick=loadAttendance; loadAttendance();
+
+  const loadSalary=async()=>{
+    const ym=document.getElementById("salaryMonth").value||month,b=monthBounds(ym);
+    try{
+      const q=await withTimeout(dbc.collection(P("attendance")).where("date",">=",b.from).where("date","<=",b.to).get());
+      const grouped={}; q.docs.forEach(d=>{const r=d.data();grouped[r.username]=(grouped[r.username]||0)+1;});
+      document.getElementById("salaryReportBox").innerHTML=`${cache.staff.length?cache.staff.map(s=>{const present=grouped[s.username]||0,monthly=Number(s.salary||0),earned=monthly>0?(monthly/b.days)*present:0;return `<div class="entry"><div><div style="font-weight:800">${escapeHtml(s.name||s.username)}</div><div class="meta">மாத சம்பளம்: ${fmt(monthly)} · ${present}/${b.days} நாட்கள்</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--blue)">${fmt(earned)}</div><div class="meta">கணக்கிடப்பட்ட சம்பளம்</div></div></div>`}).join(""):'<div class="small">பணியாளர்கள் இல்லை.</div>'}`;
+    }catch(e){document.getElementById("salaryReportBox").innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
+  };
+  document.getElementById("runSalaryReport").onclick=loadSalary; loadSalary();
 }
 
 function renderBusinessTypeManager(body){
@@ -777,6 +833,7 @@ function renderStaff(){
       <div><h1 style="margin:0;font-size:18px">${escapeHtml(me.name||session.username)}</h1><div class="meta">${escapeHtml(APP_NAME)} · ${escapeHtml(me.role||"Staff")}</div></div>
     </div><button class="btn-outline btn-sm" id="logoutBtn">லாக்அவுட்</button></div>
     <div class="row" style="margin-bottom:12px"><button class="btn-outline btn-sm" id="viewIdCardBtn">ஐடி கார்டு</button><button class="btn-outline btn-sm" id="uploadMyPhotoBtn">போட்டோ மாற்று</button><input type="file" id="myPhotoInput" accept="image/*" class="hidden"></div>
+    <div class="card" style="background:var(--green-light);border-color:var(--green);color:var(--green);padding:12px"><b>✅ இன்று Attendance பதிவு செய்யப்பட்டுள்ளது</b><div class="small" style="color:var(--green);margin-top:4px">${escapeHtml(todayStr())} · Login செய்த நேரமே Check-in ஆக சேமிக்கப்படும்.</div></div>
     <div id="idCardModal" class="hidden">
       <div class="id-card-wrap" id="printableIdCard"><div class="id-header"><h2>${escapeHtml(APP_NAME)}</h2><p>STAFF IDENTITY CARD</p></div>
       <div class="id-body">${me.photo?`<img src="${me.photo}" class="id-photo">`:'<div class="id-photo" style="display:inline-flex;align-items:center;justify-content:center;font-size:30px">👤</div>'}
