@@ -527,10 +527,10 @@ function renderEntries(body){
       <label>விவரம்</label><input id="edesc">
       <button class="btn-primary" id="addBtn">பதிவு சேர்</button>
     </div>
-    <div class="card"><div style="font-weight:700;margin-bottom:8px">சமீபத்திய பதிவுகள்</div>
+    <div class="card"><div style="font-weight:700;margin-bottom:8px">வருவாய் / செலவு ஸ்டேட்மெண்ட்</div><div class="small" style="margin-bottom:8px">Owner மற்றும் Master View-ல் பதிவுகளை பார்த்து திருத்தலாம்.</div>
     ${all.length?all.map(e=>`
       <div class="entry"><div><div style="font-weight:700">${escapeHtml(e.desc||"-")} <span class="meta">(${escapeHtml(e.by||"-")})</span></div><div class="meta">${escapeHtml(e.date||"-")}</div></div>
-      <div style="display:flex;align-items:center;gap:8px"><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div><button class="btn-danger btn-sm" data-delentry="${escapeHtml(e.id)}">நீக்கு</button></div></div>`).join(""):'<div class="small">பதிவுகள் எதுவும் இல்லை</div>'}</div>`;
+      <div style="display:flex;align-items:center;gap:6px"><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div><button class="btn-outline btn-sm" data-editentry="${escapeHtml(e.id)}">திருத்து</button><button class="btn-danger btn-sm" data-delentry="${escapeHtml(e.id)}">நீக்கு</button></div></div>`).join(""):'<div class="small">பதிவுகள் எதுவும் இல்லை</div>'}</div>`;
   attachBizTabs();
   document.getElementById("addBtn").onclick=async()=>{
     const amt=parseFloat(document.getElementById("eamt").value);
@@ -542,6 +542,20 @@ function renderEntries(body){
       await refreshAll();render();
     }catch(e){alert("பதிவு சேமிக்க முடியவில்லை:\n"+e.message)}
   };
+  document.querySelectorAll("[data-editentry]").forEach(b=>b.onclick=async()=>{
+    const e=cache.entries.find(x=>x.id===b.dataset.editentry);
+    if(!e)return;
+    const type=prompt("வகை (in = வரவு, out = செலவு):",e.type||"in");
+    if(type!=="in"&&type!=="out")return;
+    const amt=prompt("தொகை (₹):",e.amt||0);
+    const num=parseFloat(amt);
+    if(!num||num<=0){alert("சரியான தொகையை உள்ளிடவும்");return}
+    const desc=prompt("விவரம்:",e.desc||"");
+    try{
+      await withTimeout(dbc.doc(P("entries/"+b.dataset.editentry)).update({type,amt:num,desc:String(desc||"").trim(),editedAt:Date.now(),editedBy:session.username||session.role}));
+      await refreshAll();render();
+    }catch(err){alert("பதிவை திருத்த முடியவில்லை:\n"+err.message)}
+  });
   document.querySelectorAll("[data-delentry]").forEach(b=>b.onclick=async()=>{
     if(!confirm("இந்த பதிவை குப்பைத்தொட்டிக்கு நகர்த்தவா?"))return;
     try{await dbc.doc(P("entries/"+b.dataset.delentry)).update({deleted:true});await refreshAll();render()}catch(e){alert(e.message)}
