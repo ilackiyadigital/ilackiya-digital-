@@ -204,6 +204,7 @@ async function refreshAll(){
     const cat=await dbc.doc(P("config/categories")).get();
     if(cat.exists&&Array.isArray(cat.data().list)&&cat.data().list.length) BIZ=cat.data().list;
   }catch(e){console.warn("categories:",e)}
+  if(!BIZ.some(b=>b.id===activeBiz)) activeBiz=BIZ[0]?.id||"eservice";
   document.title=APP_NAME;
 }
 
@@ -363,8 +364,8 @@ async function renderMaster(){
         <div class="card"><div style="font-weight:700;margin-bottom:10px">பதிவு செய்யப்பட்ட கடைகள் (${active.length})</div>
         ${active.length?active.map(b=>`
           <div class="entry">
-            <div><div style="font-weight:800">${escapeHtml(b.name||b.id)}</div><div class="meta">Code: <b>${escapeHtml(b.id)}</b></div></div>
-            <div style="display:flex;gap:6px"><button class="btn-outline btn-sm" data-view="${escapeHtml(b.id)}">பார்</button><button class="btn-danger btn-sm" data-softdel="${escapeHtml(b.id)}">நீக்கு</button></div>
+            <div><div style="font-weight:800">${escapeHtml(b.name||b.id)}</div><div class="meta">Code: <b>${escapeHtml(b.id)}</b> · ${escapeHtml(b.businessType||"தொழில் வகை அமைக்கப்படவில்லை")}</div></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="btn-outline btn-sm" data-editbiz="${escapeHtml(b.id)}">✏️ மாற்று</button><button class="btn-outline btn-sm" data-view="${escapeHtml(b.id)}">பார்</button><button class="btn-danger btn-sm" data-softdel="${escapeHtml(b.id)}">நீக்கு</button></div>
           </div>`).join(""):'<div class="small">கடைகள் எதுவும் இல்லை</div>'}
         </div>`;
       document.getElementById("createBizBtn").onclick=async()=>{
@@ -377,13 +378,39 @@ async function renderMaster(){
           if(!exists.exists)break;
         }
         try{
-          await withTimeout(dbc.doc("businesses/"+code).set({name,createdAt:Date.now(),deleted:false}));
+          await withTimeout(dbc.doc("businesses/"+code).set({name,createdAt:Date.now(),deleted:false,businessType:DEFAULT_BIZ[0].name}));
           await withTimeout(dbc.doc("businesses/"+code+"/config/auth").set({ownerUsername:"owner",ownerPassword:"owner123"}));
           await withTimeout(dbc.doc("businesses/"+code+"/config/categories").set({list:DEFAULT_BIZ}));
           alert("புதிய கடை உருவாக்கப்பட்டது!\nBusiness Code: "+code);
           renderMaster();
         }catch(e){alert("உருவாக்க முடியவில்லை:\n"+e.message)}
       };
+      document.querySelectorAll("[data-editbiz]").forEach(b=>b.onclick=async()=>{
+        const id=b.dataset.editbiz;
+        try{
+          const snap=await withTimeout(dbc.doc("businesses/"+id).get());
+          if(!snap.exists){alert("கடை கிடைக்கவில்லை");return}
+          const data=snap.data()||{};
+          const name=prompt("கடை பெயர்:",data.name||id);
+          if(name===null)return;
+          const trimmed=name.trim();
+          if(!trimmed){alert("கடை பெயர் காலியாக இருக்கக்கூடாது");return}
+          const typesSnap=await withTimeout(dbc.doc("businesses/"+id+"/config/businessTypes").get());
+          let types=typesSnap.exists&&Array.isArray(typesSnap.data().list)?typesSnap.data().list:DEFAULT_BIZ.map(x=>x.name);
+          const current=data.businessType||types[0]||DEFAULT_BIZ[0].name;
+          const type=prompt("Business Type / தொழில் வகை:\n\n"+types.map((x,i)=>(i+1)+". "+x).join("\n")+"\n\nஎண் அல்லது புதிய பெயர் உள்ளிடலாம்:",current);
+          if(type===null)return;
+          let chosen=type.trim();
+          const n=parseInt(chosen,10);
+          if(Number.isInteger(n)&&n>=1&&n<=types.length) chosen=types[n-1];
+          if(!chosen)chosen=current;
+          if(!types.includes(chosen))types.push(chosen);
+          await withTimeout(dbc.doc("businesses/"+id).update({name:trimmed,businessType:chosen}));
+          await withTimeout(dbc.doc("businesses/"+id+"/config/businessTypes").set({list:types}));
+          alert("கடை பெயர் / Business Type மாற்றப்பட்டது.\nBusiness Code மாறவில்லை: "+id);
+          renderMaster();
+        }catch(e){alert("மாற்ற முடியவில்லை:\n"+e.message)}
+      });
       document.querySelectorAll("[data-view]").forEach(b=>b.onclick=async()=>{
         masterViewBizId=b.dataset.view;bizId=masterViewBizId;session={role:"owner"};await refreshAll();render();
       });
@@ -527,10 +554,10 @@ function renderEntries(body){
       <label>விவரம்</label><input id="edesc">
       <button class="btn-primary" id="addBtn">பதிவு சேர்</button>
     </div>
-    <div class="card"><div style="font-weight:700;margin-bottom:8px">வருவாய் / செலவு ஸ்டேட்மெண்ட்</div><div class="small" style="margin-bottom:8px">Owner மற்றும் Master View-ல் பதிவுகளை பார்த்து திருத்தலாம்.</div>
+    <div class="card"><div style="font-weight:700;margin-bottom:8px">சமீபத்திய பதிவுகள்</div>
     ${all.length?all.map(e=>`
       <div class="entry"><div><div style="font-weight:700">${escapeHtml(e.desc||"-")} <span class="meta">(${escapeHtml(e.by||"-")})</span></div><div class="meta">${escapeHtml(e.date||"-")}</div></div>
-      <div style="display:flex;align-items:center;gap:6px"><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div><button class="btn-outline btn-sm" data-editentry="${escapeHtml(e.id)}">திருத்து</button><button class="btn-danger btn-sm" data-delentry="${escapeHtml(e.id)}">நீக்கு</button></div></div>`).join(""):'<div class="small">பதிவுகள் எதுவும் இல்லை</div>'}</div>`;
+      <div style="display:flex;align-items:center;gap:8px"><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div><button class="btn-danger btn-sm" data-delentry="${escapeHtml(e.id)}">நீக்கு</button></div></div>`).join(""):'<div class="small">பதிவுகள் எதுவும் இல்லை</div>'}</div>`;
   attachBizTabs();
   document.getElementById("addBtn").onclick=async()=>{
     const amt=parseFloat(document.getElementById("eamt").value);
@@ -542,20 +569,6 @@ function renderEntries(body){
       await refreshAll();render();
     }catch(e){alert("பதிவு சேமிக்க முடியவில்லை:\n"+e.message)}
   };
-  document.querySelectorAll("[data-editentry]").forEach(b=>b.onclick=async()=>{
-    const e=cache.entries.find(x=>x.id===b.dataset.editentry);
-    if(!e)return;
-    const type=prompt("வகை (in = வரவு, out = செலவு):",e.type||"in");
-    if(type!=="in"&&type!=="out")return;
-    const amt=prompt("தொகை (₹):",e.amt||0);
-    const num=parseFloat(amt);
-    if(!num||num<=0){alert("சரியான தொகையை உள்ளிடவும்");return}
-    const desc=prompt("விவரம்:",e.desc||"");
-    try{
-      await withTimeout(dbc.doc(P("entries/"+b.dataset.editentry)).update({type,amt:num,desc:String(desc||"").trim(),editedAt:Date.now(),editedBy:session.username||session.role}));
-      await refreshAll();render();
-    }catch(err){alert("பதிவை திருத்த முடியவில்லை:\n"+err.message)}
-  });
   document.querySelectorAll("[data-delentry]").forEach(b=>b.onclick=async()=>{
     if(!confirm("இந்த பதிவை குப்பைத்தொட்டிக்கு நகர்த்தவா?"))return;
     try{await dbc.doc(P("entries/"+b.dataset.delentry)).update({deleted:true});await refreshAll();render()}catch(e){alert(e.message)}
@@ -625,19 +638,86 @@ async function renderOwnerTrash(body){
   }catch(e){body.innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>'}
 }
 
-function renderSettings(body){
+async function renderSettings(body){
+  const defaultTypes=["ஈ-சேவை மையம்","ஜெராக்ஸ் கடை","போட்டோகிராஃபி / ஸ்டூடியோ","மளிகைக் கடை","ரீசார்ஜ் / மொபைல் கடை","கம்ப்யூட்டர் / ஆன்லைன் சேவை","துணிக்கடை","ஹோட்டல் / உணவகம்","ஸ்டேஷனரி கடை"];
+  const defaultServices=["பொது சேவை","பொருட்கள் விற்பனை","பிற சேவை"];
+  let types=[...defaultTypes], services=[...defaultServices], currentType="";
+  body.innerHTML='<div class="loading">அமைப்புகள் ஏற்றுகிறது...</div>';
+  try{
+    const results=await Promise.all([
+      withTimeout(dbc.doc("businesses/"+(masterSession&&masterViewBizId?masterViewBizId:bizId)).get()),
+      withTimeout(dbc.doc(P("config/businessTypes")).get()),
+      withTimeout(dbc.doc(P("config/particulars")).get())
+    ]);
+    const businessData=results[0].data()||{};
+    if(results[1].exists && Array.isArray(results[1].data().list)) types=results[1].data().list;
+    if(results[2].exists && Array.isArray(results[2].data().list)) services=results[2].data().list;
+    currentType=businessData.businessType||types[0]||defaultTypes[0];
+    if(!types.includes(currentType)) types.unshift(currentType);
+  }catch(e){ console.warn("Business settings load:",e); }
   body.innerHTML=`
     <div class="card"><div style="font-weight:700;margin-bottom:8px">கடை பெயர் திருத்து</div><input id="set_bname" value="${escapeHtml(APP_NAME)}"><button class="btn-primary" id="saveBName">பெயரைச் சேமி</button></div>
+    <div class="card"><div style="font-weight:800;margin-bottom:8px">🏪 Business Type / தொழில் வகை</div>
+      <label>தற்போதைய தொழில் வகை</label><select id="businessTypeSelect">${types.map(t=>`<option value="${escapeHtml(t)}" ${t===currentType?'selected':''}>${escapeHtml(t)}</option>`).join("")}</select>
+      <button class="btn-primary" id="saveBusinessType">தொழில் வகையைச் சேமி</button>
+      <div class="row" style="margin-top:8px"><button class="btn-outline" id="addBusinessType">➕ புதிய வகை சேர்க்க</button><button class="btn-outline" id="editBusinessType">✏️ தேர்ந்தெடுத்ததை மாற்ற</button></div>
+      <button class="btn-danger" id="deleteBusinessType" style="width:100%;margin-top:8px">🗑️ தேர்ந்தெடுத்த வகையை நீக்க</button>
+      <div class="small" style="margin-top:8px">தொழில் வகை மாற்றுவதால் பழைய வரவு-செலவு மற்றும் பணியாளர் பதிவுகள் நீக்கப்படாது.</div>
+    </div>
+    <div class="card"><div style="font-weight:800;margin-bottom:8px">📋 Particulars / Services</div>
+      <div id="serviceList">${services.length?services.map((x,i)=>`<div class="entry"><div>${escapeHtml(x)}</div><div style="display:flex;gap:5px"><button class="btn-outline btn-sm" data-editservice="${i}">மாற்று</button><button class="btn-danger btn-sm" data-delservice="${i}">நீக்கு</button></div></div>`).join(""):'<div class="small">சேவைகள் இல்லை</div>'}</div>
+      <label>புதிய Particular / Service</label><input id="newService" placeholder="எ.கா. Photo Print / அரிசி / Recharge"><button class="btn-primary" id="addService">➕ Particular சேர்க்க</button>
+    </div>
     <div class="card"><div style="font-weight:700;margin-bottom:8px">Owner Login மாற்ற</div><label>Login ID</label><input id="o_uid" value="${escapeHtml(cache.owner.ownerUsername)}"><label>புதிய கடவுச்சொல்</label><input id="o_pwd" type="password" value="${escapeHtml(cache.owner.ownerPassword)}"><button class="btn-primary" id="saveOPass">சேமி</button></div>
-    <div class="card"><div style="font-weight:700">Business Code</div><div style="font-size:20px;font-weight:800;margin-top:6px">${escapeHtml(bizId||"-")}</div></div>`;
+    <div class="card"><div style="font-weight:700">Business Code</div><div style="font-size:20px;font-weight:800;margin-top:6px">${escapeHtml((masterSession&&masterViewBizId?masterViewBizId:bizId)||"-")}</div><div class="small" style="margin-top:6px">Business Type மாற்றினாலும் இந்த Code மாறாது.</div></div>`;
+  const businessRef="businesses/"+(masterSession&&masterViewBizId?masterViewBizId:bizId);
+  const saveTypes=async()=>withTimeout(dbc.doc(P("config/businessTypes")).set({list:types}));
+  const saveServices=async()=>withTimeout(dbc.doc(P("config/particulars")).set({list:services}));
   document.getElementById("saveBName").onclick=async()=>{
     const n=document.getElementById("set_bname").value.trim();if(!n)return;
-    try{await dbc.doc("businesses/"+bizId).update({name:n});APP_NAME=n;document.title=n;alert("கடை பெயர் மாற்றப்பட்டது!");render()}catch(e){alert(e.message)}
+    try{await withTimeout(dbc.doc(businessRef).update({name:n}));APP_NAME=n;document.title=n;alert("கடை பெயர் மாற்றப்பட்டது!");render()}catch(e){alert(e.message)}
   };
+  document.getElementById("saveBusinessType").onclick=async()=>{
+    const chosen=document.getElementById("businessTypeSelect").value;
+    try{await withTimeout(dbc.doc(businessRef).update({businessType:chosen}));alert("Business Type சேமிக்கப்பட்டது!");}catch(e){alert("சேமிக்க முடியவில்லை: "+e.message)}
+  };
+  document.getElementById("addBusinessType").onclick=async()=>{
+    const name=prompt("புதிய Business Type பெயர் உள்ளிடவும்:");if(!name||!name.trim())return;
+    const v=name.trim();if(types.includes(v)){alert("இந்த வகை ஏற்கனவே உள்ளது");return}
+    types.push(v);try{await saveTypes();alert("புதிய Business Type சேர்க்கப்பட்டது");render()}catch(e){types.pop();alert(e.message)}
+  };
+  document.getElementById("editBusinessType").onclick=async()=>{
+    const old=document.getElementById("businessTypeSelect").value;
+    const name=prompt("Business Type-ஐ மாற்றவும்:",old);if(!name||!name.trim()||name.trim()===old)return;
+    const v=name.trim();if(types.includes(v)){alert("இந்த பெயர் ஏற்கனவே உள்ளது");return}
+    types=types.map(t=>t===old?v:t);
+    try{await saveTypes();if(currentType===old)await withTimeout(dbc.doc(businessRef).update({businessType:v}));alert("Business Type மாற்றப்பட்டது");render()}catch(e){alert(e.message)}
+  };
+  document.getElementById("deleteBusinessType").onclick=async()=>{
+    const chosen=document.getElementById("businessTypeSelect").value;
+    if(types.length<=1){alert("குறைந்தது ஒரு Business Type இருக்க வேண்டும்");return}
+    if(!confirm(`“${chosen}” வகையை பட்டியலிலிருந்து நீக்கவா? பழைய பதிவுகள் அழிக்கப்படாது.`))return;
+    types=types.filter(t=>t!==chosen);
+    try{await saveTypes();if(currentType===chosen)await withTimeout(dbc.doc(businessRef).update({businessType:types[0]}));alert("Business Type பட்டியலிலிருந்து நீக்கப்பட்டது");render()}catch(e){alert(e.message)}
+  };
+  document.getElementById("addService").onclick=async()=>{
+    const input=document.getElementById("newService"),v=input.value.trim();if(!v){alert("Particular / Service பெயர் உள்ளிடவும்");return}
+    if(services.includes(v)){alert("இந்த Service ஏற்கனவே உள்ளது");return}
+    services.push(v);try{await saveServices();render()}catch(e){services.pop();alert(e.message)}
+  };
+  document.querySelectorAll("[data-editservice]").forEach(btn=>btn.onclick=async()=>{
+    const i=Number(btn.dataset.editservice),old=services[i];const v=prompt("Particular / Service பெயரை மாற்றவும்:",old);
+    if(!v||!v.trim()||v.trim()===old)return;services[i]=v.trim();
+    try{await saveServices();render()}catch(e){services[i]=old;alert(e.message)}
+  });
+  document.querySelectorAll("[data-delservice]").forEach(btn=>btn.onclick=async()=>{
+    const i=Number(btn.dataset.delservice),old=services[i];if(!confirm(`“${old}”-ஐ நீக்கவா? ஏற்கனவே உள்ள வரவு-செலவு பதிவுகள் அழிக்கப்படாது.`))return;
+    services.splice(i,1);try{await saveServices();render()}catch(e){services.splice(i,0,old);alert(e.message)}
+  });
   document.getElementById("saveOPass").onclick=async()=>{
     const u=document.getElementById("o_uid").value.trim(),p=document.getElementById("o_pwd").value;
     if(!u||!p){alert("Login ID மற்றும் password தேவை");return}
-    try{await dbc.doc(P("config/auth")).set({ownerUsername:u,ownerPassword:p});cache.owner={ownerUsername:u,ownerPassword:p};alert("Login மாற்றப்பட்டது!");render()}catch(e){alert(e.message)}
+    try{await withTimeout(dbc.doc(P("config/auth")).set({ownerUsername:u,ownerPassword:p}));cache.owner={ownerUsername:u,ownerPassword:p};alert("Login மாற்றப்பட்டது!");render()}catch(e){alert(e.message)}
   };
 }
 
