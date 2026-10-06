@@ -480,11 +480,17 @@ function renderLogin(devRole){
     if(!u||!p){err.textContent="Login ID மற்றும் கடவுச்சொல் தேவை.";return}
     if(owner){
       if(u===cache.owner.ownerUsername&&p===cache.owner.ownerPassword){
-        session={role:"owner"};render();return;
+        session={role:"owner"};
+        try{const d=new Date();await withTimeout(dbc.collection(P("loginReports")).add({username:u,role:"Owner",date:todayStr(),time:d.toLocaleTimeString("en-IN"),ts:Date.now()}));}catch(logErr){console.warn("Owner login report:",logErr)}
+        render();return;
       }
     }else{
       const s=cache.staff.find(x=>x.username===u&&x.password===p);
-      if(s){session={role:"staff",username:u};render();return}
+      if(s){
+        session={role:"staff",username:u};
+        try{const d=new Date();await withTimeout(dbc.collection(P("loginReports")).add({username:u,role:"Staff",date:todayStr(),time:d.toLocaleTimeString("en-IN"),ts:Date.now()}));}catch(logErr){console.warn("Staff login report:",logErr)}
+        render();return
+      }
     }
     err.textContent="தவறான Login ID அல்லது கடவுச்சொல்.";
   };
@@ -520,7 +526,9 @@ function renderOwner(){
     </div>
     <div class="nav">
       <div class="tab ${ownerTab==="entries"?"active":""}" data-nav="entries">வரவு-செலவு</div>
+      <div class="tab ${ownerTab==="report"?"active":""}" data-nav="report">📊 ரிப்போர்ட்</div>
       <div class="tab ${ownerTab==="staff"?"active":""}" data-nav="staff">பணியாளர்கள்</div>
+      <div class="tab ${ownerTab==="businessType"?"active":""}" data-nav="businessType">🏪 Business Type</div>
       <div class="tab ${ownerTab==="trash"?"active":""}" data-nav="trash">மீட்பகம்</div>
       <div class="tab ${ownerTab==="settings"?"active":""}" data-nav="settings">அமைப்புகள்</div>
     </div>
@@ -532,7 +540,9 @@ function renderOwner(){
   document.querySelectorAll("[data-nav]").forEach(t=>t.onclick=()=>{ownerTab=t.dataset.nav;render()});
   const body=document.getElementById("body");
   if(ownerTab==="entries")renderEntries(body);
+  else if(ownerTab==="report")renderOwnerReport(body);
   else if(ownerTab==="staff")renderStaffMgmt(body);
+  else if(ownerTab==="businessType")renderBusinessTypeManager(body);
   else if(ownerTab==="trash")renderOwnerTrash(body);
   else renderSettings(body);
 }
@@ -618,6 +628,40 @@ function renderStaffMgmt(body){
     const sal=prompt("புதிய சம்பளம் (₹):",s.salary||0);
     try{await dbc.doc(P("staff/"+b.dataset.editstaff)).update({name:name.trim(),salary:parseFloat(sal)||0});await refreshAll();render()}catch(e){alert(e.message)}
   });
+}
+
+async function renderOwnerReport(body){
+  const all=cache.entries.slice().sort((a,b)=>Number(b.ts||0)-Number(a.ts||0));
+  const inT=all.filter(e=>e.type==="in").reduce((s,e)=>s+Number(e.amt||0),0);
+  const outT=all.filter(e=>e.type==="out").reduce((s,e)=>s+Number(e.amt||0),0);
+  const activeStaff=cache.staff.length;
+  let logins=[];
+  try{
+    const q=await withTimeout(dbc.collection(P("loginReports")).get());
+    logins=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>Number(b.ts||0)-Number(a.ts||0)).slice(0,50);
+  }catch(e){console.warn("login report:",e)}
+  body.innerHTML=`
+    <div class="card">
+      <div style="font-weight:800;font-size:17px;margin-bottom:10px">📊 Owner Login Report</div>
+      <div class="small" style="margin-bottom:12px">இந்த கடையின் வரவு-செலவு மற்றும் Login activity அறிக்கை.</div>
+      <div class="totals">
+        <div class="tbox in"><div>மொத்த வரவு</div><div class="n">${fmt(inT)}</div></div>
+        <div class="tbox out"><div>மொத்த செலவு</div><div class="n">${fmt(outT)}</div></div>
+        <div class="tbox net"><div>இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div>
+      </div>
+      <div class="row">
+        <div class="card" style="margin:0;padding:10px;text-align:center"><div class="small">பதிவுகள்</div><b>${all.length}</b></div>
+        <div class="card" style="margin:0;padding:10px;text-align:center"><div class="small">பணியாளர்கள்</div><b>${activeStaff}</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:8px">🔐 Login Activity</div>
+      ${logins.length?logins.map(x=>`<div class="entry"><div><div style="font-weight:700">${escapeHtml(x.username||x.role||"-" )}</div><div class="meta">${escapeHtml(x.role||"-")} · ${escapeHtml(x.date||"-")}</div></div><div class="meta">${escapeHtml(x.time||"")}</div></div>`).join(""):'<div class="small">Login Report இன்னும் இல்லை.</div>'}
+    </div>`;
+}
+
+function renderBusinessTypeManager(body){
+  renderSettings(body);
 }
 
 async function renderOwnerTrash(body){
