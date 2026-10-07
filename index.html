@@ -623,7 +623,7 @@ function renderStaffMgmt(body){
       <div class="top"><div style="font-weight:700">பணியாளர்கள் (${cache.staff.length})</div><button class="btn-primary btn-sm" id="toggleStaffForm" style="width:auto;margin:0">+ சேர்</button></div>
       <div id="staffForm" class="hidden" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px">
         <label>பெயர்</label><input id="sname"><label>பதவி</label><input id="srole" placeholder="Staff">
-        <label>தொலைபேசி</label><input id="sphone"><label>Login ID</label><input id="slogin">
+        <label>தொலைபேசி</label><input id="sphone" type="tel" inputmode="numeric" maxlength="10" placeholder="10 இலக்க Mobile Number"><label>Login ID</label><input id="slogin">
         <label>கடவுச்சொல்</label><input id="spass" type="password"><label>மாத சம்பளம் (₹)</label><input id="ssal" type="number">
         <label>புகைப்படம்</label><input id="sphoto" type="file" accept="image/*">
         <button class="btn-primary" id="saveStaff">பணியாளரைச் சேமி</button>
@@ -643,6 +643,7 @@ function renderStaffMgmt(body){
     let login=document.getElementById("slogin").value.trim().toLowerCase().replace(/\s+/g,"");
     const pass=document.getElementById("spass").value,sal=parseFloat(document.getElementById("ssal").value)||0;
     if(!name){alert("பெயர் தேவை");return}
+    if(phone && !/^\d{10}$/.test(phone)){alert("சரியான 10 இலக்க தொலைபேசி எண்ணை உள்ளிடவும்.");return}
     if(!login)login="st_"+uid().slice(-4);
     if(!pass){alert("கடவுச்சொல் தேவை");return}
     try{
@@ -661,6 +662,7 @@ function renderStaffMgmt(body){
     const phone=prompt("தொலைபேசி:",s.phone||"");if(phone===null)return;
     const sal=prompt("மாத சம்பளம் (₹):",s.salary||0);
     const newPass=prompt("கடவுச்சொல் (மாற்ற வேண்டாம் என்றால் காலியாக விடவும்):","");
+    if(phone.trim() && !/^\d{10}$/.test(phone.trim())){alert("சரியான 10 இலக்க தொலைபேசி எண்ணை உள்ளிடவும்.");return}
     const data={name:name.trim(),role:role.trim()||"Staff",phone:phone.trim(),salary:parseFloat(sal)||0};
     if(newPass)data.password=newPass;
     try{await dbc.doc(P("staff/"+b.dataset.editstaff)).update(data);await refreshAll();render()}catch(e){alert(e.message)}
@@ -670,29 +672,56 @@ function renderStaffMgmt(body){
 async function renderOwnerReport(body){
   const today=todayStr(), month=today.slice(0,7);
   body.innerHTML=`
-    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">📊 வரவு–செலவு ரிப்போர்ட்</div>
-      <div class="row"><div><label>தொடக்க தேதி</label><input id="reportFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="reportTo" type="date" value="${today}"></div></div>
-      <button class="btn-primary" id="runFinanceReport">ரிப்போர்ட் பார்க்க</button><div id="financeReportBox" style="margin-top:12px"></div>
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">📥 வரவு Report</div>
+      <div class="row"><div><label>தொடக்க தேதி</label><input id="incomeFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="incomeTo" type="date" value="${today}"></div></div>
+      <button class="btn-primary" id="runIncomeReport">வரவு Report பார்க்க</button><div id="incomeReportBox" style="margin-top:12px"></div>
+    </div>
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">📤 செலவு Report</div>
+      <div class="row"><div><label>தொடக்க தேதி</label><input id="expenseFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="expenseTo" type="date" value="${today}"></div></div>
+      <button class="btn-primary" id="runExpenseReport">செலவு Report பார்க்க</button><div id="expenseReportBox" style="margin-top:12px"></div>
+    </div>
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">📊 வரவு–செலவு சுருக்கம்</div>
+      <div class="row"><div><label>தொடக்க தேதி</label><input id="summaryFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="summaryTo" type="date" value="${today}"></div></div>
+      <button class="btn-primary" id="runSummaryReport">சுருக்கம் பார்க்க</button><div id="summaryReportBox" style="margin-top:12px"></div>
     </div>
     <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">👥 பணியாளர் Attendance ரிப்போர்ட்</div>
       <div class="small" style="margin-bottom:8px">பணியாளர் Login செய்த உடனே அந்த நாளுக்கான Attendance தானாக பதிவு ஆகும். ஒரே நாளில் பல Login செய்தாலும் ஒரு நாளாக மட்டுமே கணக்காகும்.</div>
       <div class="row"><div><label>தொடக்க தேதி</label><input id="attFrom" type="date" value="${month}-01"></div><div><label>முடிவு தேதி</label><input id="attTo" type="date" value="${today}"></div></div>
       <button class="btn-primary" id="runAttendanceReport">Attendance Report பார்க்க</button><div id="attendanceReportBox" style="margin-top:12px"></div>
     </div>
-    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">💰 வருகைக்கேற்ப சம்பள கணக்கு</div>
+    <div class="card"><div style="font-weight:800;font-size:17px;margin-bottom:10px">💰 Staff Salary Report</div>
       <label>சம்பள மாதம்</label><input id="salaryMonth" type="month" value="${month}">
       <button class="btn-primary" id="runSalaryReport">சம்பள கணக்கு பார்க்க</button><div id="salaryReportBox" style="margin-top:12px"></div>
       <div class="small" style="margin-top:8px">கணக்கு: மாத சம்பளம் ÷ அந்த மாதத்தின் மொத்த நாட்கள் × Attendance நாட்கள்.</div>
     </div>`;
 
-  const runFinance=()=>{
-    const from=document.getElementById("reportFrom").value,to=document.getElementById("reportTo").value;
-    if(from&&to&&from>to){alert("தொடக்க தேதி முடிவு தேதியை விட பெரியதாக இருக்கக்கூடாது.");return;}
-    const all=dateRangeEntries(from,to).filter(e=>e.biz===activeBiz);
-    const inT=all.filter(e=>e.type==="in").reduce((s,e)=>s+Number(e.amt||0),0), outT=all.filter(e=>e.type==="out").reduce((s,e)=>s+Number(e.amt||0),0);
-    document.getElementById("financeReportBox").innerHTML=`<div class="totals"><div class="tbox in"><div>வரவு</div><div class="n">${fmt(inT)}</div></div><div class="tbox out"><div>செலவு</div><div class="n">${fmt(outT)}</div></div><div class="tbox net"><div>இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div></div><div style="font-weight:700;margin-bottom:6px">${escapeHtml(from||"-")} முதல் ${escapeHtml(to||"-")} வரை · ${all.length} பதிவுகள்</div>${all.length?all.map(e=>`<div class="entry"><div><div style="font-weight:700">${escapeHtml(e.desc||"-")}</div><div class="meta">${escapeHtml(e.date||"-")} · ${escapeHtml(e.by||"-")}</div></div><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div></div>`).join(""):'<div class="small">இந்த தேதிகளில் பதிவு இல்லை.</div>'}`;
+  async function getFinanceEntries(from,to){
+    if(from&&to&&from>to){throw new Error("தொடக்க தேதி முடிவு தேதியை விட பெரியதாக இருக்கக்கூடாது.");}
+    let q=dbc.collection(P("entries"));
+    if(from) q=q.where("date",">=",from);
+    if(to) q=q.where("date","<=",to);
+    const snap=await withTimeout(q.get());
+    return snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>!e.deleted && e.biz===activeBiz).sort((a,b)=>String(a.date||"").localeCompare(String(b.date||"")));
+  }
+  function rowsHtml(all){
+    return all.length?all.map(e=>`<div class="entry"><div><div style="font-weight:700">${escapeHtml(e.desc||"-")}</div><div class="meta">${escapeHtml(e.date||"-")} · ${escapeHtml(e.by||"-")}</div></div><div class="${e.type==="in"?"amt-in":"amt-out"}">${e.type==="in"?"+":"-"}${fmt(e.amt)}</div></div>`).join(""):'<div class="small">இந்த தேதிகளில் பதிவு இல்லை.</div>';
+  }
+  const runIncome=async()=>{
+    const box=document.getElementById("incomeReportBox"); box.innerHTML='<div class="loading">வரவு Report ஏற்றுகிறது...</div>';
+    try{const from=document.getElementById("incomeFrom").value,to=document.getElementById("incomeTo").value,all=(await getFinanceEntries(from,to)).filter(e=>e.type==="in"),total=all.reduce((s,e)=>s+Number(e.amt||0),0);box.innerHTML=`<div class="tbox in"><div>மொத்த வரவு</div><div class="n">${fmt(total)}</div></div><div style="font-weight:700;margin:8px 0">${escapeHtml(from)} முதல் ${escapeHtml(to)} வரை · ${all.length} பதிவுகள்</div>${rowsHtml(all)}`;}catch(e){box.innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
   };
-  document.getElementById("runFinanceReport").onclick=runFinance; runFinance();
+  const runExpense=async()=>{
+    const box=document.getElementById("expenseReportBox"); box.innerHTML='<div class="loading">செலவு Report ஏற்றுகிறது...</div>';
+    try{const from=document.getElementById("expenseFrom").value,to=document.getElementById("expenseTo").value,all=(await getFinanceEntries(from,to)).filter(e=>e.type==="out"),total=all.reduce((s,e)=>s+Number(e.amt||0),0);box.innerHTML=`<div class="tbox out"><div>மொத்த செலவு</div><div class="n">${fmt(total)}</div></div><div style="font-weight:700;margin:8px 0">${escapeHtml(from)} முதல் ${escapeHtml(to)} வரை · ${all.length} பதிவுகள்</div>${rowsHtml(all)}`;}catch(e){box.innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
+  };
+  const runSummary=async()=>{
+    const box=document.getElementById("summaryReportBox"); box.innerHTML='<div class="loading">சுருக்கம் ஏற்றுகிறது...</div>';
+    try{const from=document.getElementById("summaryFrom").value,to=document.getElementById("summaryTo").value,all=await getFinanceEntries(from,to),inT=all.filter(e=>e.type==="in").reduce((s,e)=>s+Number(e.amt||0),0),outT=all.filter(e=>e.type==="out").reduce((s,e)=>s+Number(e.amt||0),0);box.innerHTML=`<div class="totals"><div class="tbox in"><div>வரவு</div><div class="n">${fmt(inT)}</div></div><div class="tbox out"><div>செலவு</div><div class="n">${fmt(outT)}</div></div><div class="tbox net"><div>இருப்பு</div><div class="n">${fmt(inT-outT)}</div></div></div><div style="font-weight:700;margin:8px 0">${escapeHtml(from)} முதல் ${escapeHtml(to)} வரை · ${all.length} பதிவுகள்</div>`;}catch(e){box.innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
+  };
+  document.getElementById("runIncomeReport").onclick=runIncome;
+  document.getElementById("runExpenseReport").onclick=runExpense;
+  document.getElementById("runSummaryReport").onclick=runSummary;
+  runIncome(); runExpense(); runSummary();
 
   const loadAttendance=async()=>{
     const from=document.getElementById("attFrom").value,to=document.getElementById("attTo").value;
@@ -700,7 +729,7 @@ async function renderOwnerReport(body){
     try{
       const q=await withTimeout(dbc.collection(P("attendance")).where("date",">=",from||"0000-01-01").where("date","<=",to||"9999-12-31").get());
       const rows=q.docs.map(d=>d.data()), grouped={}; rows.forEach(r=>{grouped[r.username]=(grouped[r.username]||0)+1;});
-      document.getElementById("attendanceReportBox").innerHTML=`${cache.staff.length?cache.staff.map(s=>{const days=grouped[s.username]||0;return `<div class="entry"><div><div style="font-weight:800">${escapeHtml(s.name||s.username)}</div><div class="meta">ID: ${escapeHtml(s.username)} · ${escapeHtml(s.role||"Staff")}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--green)">${days} நாள்</div><div class="meta">Present</div></div></div>`}).join(""):'<div class="small">பணியாளர்கள் இல்லை.</div>'}<div class="small" style="margin-top:8px">மொத்த Attendance பதிவுகள்: ${rows.length}</div>`;
+      document.getElementById("attendanceReportBox").innerHTML=`${cache.staff.length?cache.staff.map(s=>{const days=grouped[s.username]||0;return `<div class="entry"><div><div style="font-weight:800">${escapeHtml(s.name||s.username)}</div><div class="meta">ID: ${escapeHtml(s.username)} · ${escapeHtml(s.role||"Staff")} · ${escapeHtml(s.phone||"Phone இல்லை")}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--green)">${days} நாள்</div><div class="meta">Present</div></div></div>`}).join(""):'<div class="small">பணியாளர்கள் இல்லை.</div>'}<div class="small" style="margin-top:8px">மொத்த Attendance பதிவுகள்: ${rows.length}</div>`;
     }catch(e){document.getElementById("attendanceReportBox").innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
   };
   document.getElementById("runAttendanceReport").onclick=loadAttendance; loadAttendance();
@@ -710,12 +739,11 @@ async function renderOwnerReport(body){
     try{
       const q=await withTimeout(dbc.collection(P("attendance")).where("date",">=",b.from).where("date","<=",b.to).get());
       const grouped={}; q.docs.forEach(d=>{const r=d.data();grouped[r.username]=(grouped[r.username]||0)+1;});
-      document.getElementById("salaryReportBox").innerHTML=`${cache.staff.length?cache.staff.map(s=>{const present=grouped[s.username]||0,monthly=Number(s.salary||0),earned=monthly>0?(monthly/b.days)*present:0;return `<div class="entry"><div><div style="font-weight:800">${escapeHtml(s.name||s.username)}</div><div class="meta">மாத சம்பளம்: ${fmt(monthly)} · ${present}/${b.days} நாட்கள்</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--blue)">${fmt(earned)}</div><div class="meta">கணக்கிடப்பட்ட சம்பளம்</div></div></div>`}).join(""):'<div class="small">பணியாளர்கள் இல்லை.</div>'}`;
+      document.getElementById("salaryReportBox").innerHTML=`${cache.staff.length?cache.staff.map(s=>{const present=grouped[s.username]||0,monthly=Number(s.salary||0),earned=monthly>0?(monthly/b.days)*present:0;return `<div class="entry"><div><div style="font-weight:800">${escapeHtml(s.name||s.username)}</div><div class="meta">Phone: ${escapeHtml(s.phone||"-")} · மாத சம்பளம்: ${fmt(monthly)} · ${present}/${b.days} நாட்கள்</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--blue)">${fmt(earned)}</div><div class="meta">கணக்கிடப்பட்ட சம்பளம்</div></div></div>`}).join(""):'<div class="small">பணியாளர்கள் இல்லை.</div>'}`;
     }catch(e){document.getElementById("salaryReportBox").innerHTML='<div class="errorbox">'+escapeHtml(e.message)+'</div>';}
   };
   document.getElementById("runSalaryReport").onclick=loadSalary; loadSalary();
 }
-
 function renderBusinessTypeManager(body){
   renderSettings(body);
 }
