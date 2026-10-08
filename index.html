@@ -56,6 +56,7 @@ button{border:0;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:
 
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 "use strict";
@@ -554,7 +555,10 @@ function renderOwner(){
   app.innerHTML=`
     <div class="top">
       <div><h1 style="margin:0;font-size:19px;font-weight:800">${escapeHtml(APP_NAME)}</h1><div class="meta">ஓனர் டாஷ்போர்டு</div></div>
-      <button class="btn-outline btn-sm" id="logoutBtn">${masterSession?"← Master":"லாக்அவுட்"}</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="btn-outline btn-sm" id="ownerLoginDisplayBtn">🔐 Owner Login</button>
+        <button class="btn-outline btn-sm" id="logoutBtn">${masterSession?"← Master":"லாக்அவுட்"}</button>
+      </div>
     </div>
     <div class="nav">
       <div class="tab ${ownerTab==="entries"?"active":""}" data-nav="entries">வரவு-செலவு</div>
@@ -565,6 +569,9 @@ function renderOwner(){
       <div class="tab ${ownerTab==="settings"?"active":""}" data-nav="settings">அமைப்புகள்</div>
     </div>
     <div id="body"></div>`;
+  document.getElementById("ownerLoginDisplayBtn").onclick=()=>{
+    alert("Owner Login ID: " + (cache.owner?.ownerUsername || "owner") + "\n\nPassword பாதுகாப்புக்காக Settings பகுதியில் மட்டும் மாற்றலாம்/பார்க்கலாம்.");
+  };
   document.getElementById("logoutBtn").onclick=()=>{
     session=null;
     if(masterSession){masterViewBizId=null;renderMaster()}else render();
@@ -854,6 +861,10 @@ async function renderSettings(body){
 ========================= */
 function renderStaff(){
   const me=cache.staff.find(s=>s.username===session.username)||{name:session.username,role:"Staff"};
+  const shopEntries=cache.entries.filter(e=>e.biz===activeBiz);
+  const shopIncome=shopEntries.filter(e=>e.type==="in").reduce((s,e)=>s+Number(e.amt||0),0);
+  const shopExpense=shopEntries.filter(e=>e.type==="out").reduce((s,e)=>s+Number(e.amt||0),0);
+  const shopBalance=shopIncome-shopExpense;
   const list=cache.entries.filter(e=>e.biz===activeBiz&&e.by===session.username).slice(0,20);
   app.innerHTML=`
     <div class="top"><div style="display:flex;align-items:center;gap:10px">
@@ -862,6 +873,14 @@ function renderStaff(){
     </div><button class="btn-outline btn-sm" id="logoutBtn">லாக்அவுட்</button></div>
     <div class="row" style="margin-bottom:12px"><button class="btn-outline btn-sm" id="viewIdCardBtn">ஐடி கார்டு</button><button class="btn-outline btn-sm" id="uploadMyPhotoBtn">போட்டோ மாற்று</button><input type="file" id="myPhotoInput" accept="image/*" class="hidden"></div>
     <div class="card" style="background:var(--green-light);border-color:var(--green);color:var(--green);padding:12px"><b>✅ இன்று Attendance பதிவு செய்யப்பட்டுள்ளது</b><div class="small" style="color:var(--green);margin-top:4px">${escapeHtml(todayStr())} · Login செய்த நேரமே Check-in ஆக சேமிக்கப்படும்.</div></div>
+    <div class="card"><div style="font-weight:800;margin-bottom:8px">💰 கடை கணக்கு நிலவரம்</div>
+      <div class="totals" style="margin-bottom:0">
+        <div class="tbox in"><div>வரவு</div><div class="n">${fmt(shopIncome)}</div></div>
+        <div class="tbox out"><div>செலவு</div><div class="n">${fmt(shopExpense)}</div></div>
+        <div class="tbox net"><div>இருப்பு</div><div class="n">${fmt(shopBalance)}</div></div>
+      </div>
+      <div class="small" style="margin-top:8px">Owner Dashboard-ல் காணப்படும் அதே கடை கணக்கு நிலவரம்.</div>
+    </div>
     <div id="idCardModal" class="hidden">
       <div class="id-card-wrap" id="printableIdCard"><div class="id-header"><h2>${escapeHtml(APP_NAME)}</h2><p>STAFF IDENTITY CARD</p></div>
       <div class="id-body">${me.photo?`<img src="${me.photo}" class="id-photo">`:'<div class="id-photo" style="display:inline-flex;align-items:center;justify-content:center;font-size:30px">👤</div>'}
@@ -883,8 +902,30 @@ function renderStaff(){
       try{await dbc.doc(P("staff/"+session.username)).update({photo:b64});await refreshAll();render()}catch(err){alert(err.message)}
     });
   };
-  document.getElementById("downloadIdCardBtn").onclick=()=>{
-    alert("ID Card படம் சேமிப்பு வசதிக்கு html2canvas library தேவை. இந்த version-ல் external dependency நீக்கப்பட்டதால் browser print/screenshot பயன்படுத்தலாம்.");
+  document.getElementById("downloadIdCardBtn").onclick=async()=>{
+    const card=document.getElementById("printableIdCard");
+    if(!card){alert("ID Card கிடைக்கவில்லை.");return;}
+    if(typeof html2canvas!=="function"){alert("பட சேமிப்பு library ஏற்றப்படவில்லை. Internet இணைப்பை சரிபார்த்து மீண்டும் முயற்சி செய்யவும்.");return;}
+    const btn=document.getElementById("downloadIdCardBtn");
+    const oldText=btn.textContent;
+    btn.disabled=true; btn.textContent="படம் தயாராகிறது...";
+    try{
+      const canvas=await html2canvas(card,{scale:3,useCORS:true,backgroundColor:"#ffffff",logging:false});
+      const filename="Staff_ID_"+String(session.username||"card").replace(/[^a-zA-Z0-9_-]/g,"_")+".png";
+      canvas.toBlob(blob=>{
+        if(!blob){alert("படம் உருவாக்க முடியவில்லை.");return;}
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url; a.download=filename; a.rel="noopener";
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),2000);
+      },"image/png");
+    }catch(err){
+      console.error("ID card image:",err);
+      alert("ஐடி கார்டை படம் ஆக சேமிக்க முடியவில்லை. மீண்டும் முயற்சி செய்யவும்.");
+    }finally{
+      btn.disabled=false; btn.textContent=oldText;
+    }
   };
   document.getElementById("logoutBtn").onclick=()=>{session=null;render()};
   document.getElementById("addBtn").onclick=async()=>{
